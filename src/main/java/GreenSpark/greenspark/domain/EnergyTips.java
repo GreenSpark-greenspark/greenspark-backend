@@ -1,5 +1,6 @@
 package GreenSpark.greenspark.domain;
 
+import GreenSpark.greenspark.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class EnergyTips {
+public class EnergyTips extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "energyTips_id")

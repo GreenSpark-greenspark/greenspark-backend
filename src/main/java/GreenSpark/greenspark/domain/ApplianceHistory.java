@@ -1,5 +1,6 @@
 package GreenSpark.greenspark.domain;
 
+import GreenSpark.greenspark.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ApplianceHistory {
+public class ApplianceHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "applianceHistory_id")
