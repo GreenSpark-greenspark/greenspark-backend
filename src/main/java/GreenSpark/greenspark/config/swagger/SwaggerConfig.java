@@ -15,8 +15,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI stewAPI() {
         Info info = new Info()
-                .title("STEW API")
-                .description("STEW API 명세서")
+                .title("GreenSpark API")
+                .description("GreenSpark API 명세서")
                 .version("1.0.0");
 
         String jwtSchemeName = "JWT TOKEN";
