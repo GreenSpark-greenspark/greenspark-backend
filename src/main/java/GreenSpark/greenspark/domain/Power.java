@@ -4,16 +4,19 @@ import GreenSpark.greenspark.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.YearMonth;
+
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Power extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "usage_id")
-    private Long usageId;
+    @Column(name = "power_id")
+    private Long powerId;
     @Column(nullable = false)
     private int usageAmount;
     @Column(nullable = false)
@@ -23,7 +26,7 @@ public class Power extends BaseEntity {
     @Column(nullable = false)
     private int month;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 }
