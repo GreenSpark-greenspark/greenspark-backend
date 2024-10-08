@@ -27,12 +27,15 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private int household_members;
     @Column(nullable = false)
-    private Date electricity_due_date;
+    private int electricity_due_date;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Appliance> applianceList = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ApplianceHistory> applianceHistoryList = new ArrayList<>();
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Power> powerList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Point> pointList = new ArrayList<>();
 }
 
