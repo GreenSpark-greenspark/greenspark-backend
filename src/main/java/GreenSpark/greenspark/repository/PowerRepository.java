@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface PowerRepository extends JpaRepository<Power, Long> {
     Optional<Power> findByYearAndMonthAndUser(int year, int month, User user);
     List<Power> findAllByUserAndYearBetweenAndMonthBetween(User user, int startYear, int endYear, int startMonth, int endMonth);
+    List<Power> findByUser(User user);
 }

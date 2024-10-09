@@ -24,4 +24,16 @@ public class PowerResponseDto {
         private int month;
         private int value;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class PowerGetAllResponseDto {
+        private int year;
+        private int month;
+        private int cost;
+        @JsonProperty("usage_amount")
+        private int usageAmount;
+    }
 }
