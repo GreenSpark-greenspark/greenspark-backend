@@ -1,10 +1,9 @@
 package GreenSpark.greenspark.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 public class PowerResponseDto {
     @Builder
@@ -14,5 +13,15 @@ public class PowerResponseDto {
     public static class PowerCreateResponseDto {
         @JsonProperty("user_id")
         Long userId;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class PowerGetDataResponseDto {
+        private int year;
+        private int month;
+        private int value;
     }
 }
