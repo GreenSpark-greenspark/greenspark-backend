@@ -11,7 +11,6 @@ import java.time.YearMonth;
 
 public class PowerRequestDto {
 
-    @ToString
     @Getter
     @Setter
     public static class PowerCreateRequestDto{
@@ -23,6 +22,5 @@ public class PowerRequestDto {
         private int cost;
         @NotNull
         private int usageAmount;
-
     }
 }
