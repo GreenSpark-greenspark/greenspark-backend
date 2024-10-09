@@ -38,4 +38,12 @@ public class PowerController {
         List<PowerResponseDto.PowerGetDataResponseDto> powerDataList = powerService.getPowerData(userId, display);
         return DataResponseDto.of(powerDataList, "해당 유저의 전기요금 또는 전력사용량을 조회했습니다.");
     }
+
+    @GetMapping(value = "/power/history/{userId}")
+    public DataResponseDto<List<PowerResponseDto.PowerGetAllResponseDto>> getAllPowers(
+            @PathVariable Long userId){
+        List<PowerResponseDto.PowerGetAllResponseDto> powerList = powerService.getAllPowers(userId);
+        return DataResponseDto.of(powerList, "해당 유저의 모든 파워 정보를 조회했습니다.");
+    }
+
 }

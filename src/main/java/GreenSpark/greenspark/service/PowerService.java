@@ -69,4 +69,14 @@ public class PowerService {
             throw new IllegalArgumentException("알맞은 display 문자열이 아닙니다.: " + display);
         }
     }
+
+    public List<PowerResponseDto.PowerGetAllResponseDto> getAllPowers(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        List<Power> powers = powerRepository.findByUser(user);
+        return powers.stream()
+                .map(power -> new PowerResponseDto.PowerGetAllResponseDto(power.getYear(), power.getMonth(), power.getCost(), power.getUsageAmount()))
+                .collect(Collectors.toList());
+    }
 }
