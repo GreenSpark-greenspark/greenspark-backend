@@ -1,5 +1,8 @@
 package GreenSpark.greenspark.domain.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ApplianceCategory {
     WASHING_MACHINE("EEP_01_LIST", "전기세탁기(일반)"),
     VACUUM_CLEANER("EEP_05_LIST", "전기진공청소기"),
@@ -20,13 +23,6 @@ public enum ApplianceCategory {
         this.equipmentName =equipmentName;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public String getEquipmentName() {
-        return equipmentName;
-    }
 
     public static String getCode(String equipmentName) {
         for (ApplianceCategory applianceCategory : ApplianceCategory.values()) {
@@ -35,14 +31,5 @@ public enum ApplianceCategory {
             }
         }
         throw new IllegalArgumentException("기자재 명칭과 맞는 code를 찾을 수 없습니다.");
-    }
-
-    public static ApplianceCategory fromCode(String code) {
-        for (ApplianceCategory category : values()) {
-            if (category.getCode().equalsIgnoreCase(code)) {
-                return category;
-            }
-        }
-        throw new IllegalArgumentException("Unknown category code: " + code);
     }
 }

@@ -31,7 +31,7 @@ public class AppliancesService {
                 queryParams.append("&q3=").append(URLEncoder.encode(companyName, "UTF-8"));
             }
 
-            String fullUrl = baseURL + category + "?" + queryParams.toString();
+            String fullUrl = baseURL + category + "?" + queryParams;
             System.out.println("API 요청 URL: " + fullUrl);
 
             URL url = new URL(fullUrl);
