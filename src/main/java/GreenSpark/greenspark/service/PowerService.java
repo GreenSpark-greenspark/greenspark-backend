@@ -23,21 +23,39 @@ public class PowerService {
     private final PowerRepository powerRepository;
     private final UserRepository userRepository;
 
-    public Power createPower(Long userId, PowerRequestDto.PowerCreateRequestDto powerCreateRequestDto) {
+    public Power createCostPower(Long userId, PowerRequestDto.PowerCreateCostRequestDto powerCreateCostRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
-        int year = powerCreateRequestDto.getYear();
-        int month = powerCreateRequestDto.getMonth();
+        int year = powerCreateCostRequestDto.getYear();
+        int month = powerCreateCostRequestDto.getMonth();
         Optional<Power> existingPower = powerRepository.findByYearAndMonthAndUser(year, month, user);
 
         Power power;
         if (existingPower.isPresent()) { // 기존 데이터가 있을 경우 업데이트
             power = existingPower.get();
-            power.setCost(powerCreateRequestDto.getCost());
-            power.setUsageAmount(powerCreateRequestDto.getUsageAmount());
+            power.setCost(powerCreateCostRequestDto.getCost());
         } else { // 기존 데이터가 없을 경우 새로 생성
-            power = PowerConverter.toPower(user, powerCreateRequestDto);
+            power = PowerConverter.CostRequestDtotoPower(user, powerCreateCostRequestDto);
+        }
+
+        return powerRepository.save(power);
+    }
+
+    public Power createUsagePower(Long userId, PowerRequestDto.PowerCreateUsageRequestDto powerCreateUsageRequestDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        int year = powerCreateUsageRequestDto.getYear();
+        int month = powerCreateUsageRequestDto.getMonth();
+        Optional<Power> existingPower = powerRepository.findByYearAndMonthAndUser(year, month, user);
+
+        Power power;
+        if (existingPower.isPresent()) { // 기존 데이터가 있을 경우 업데이트
+            power = existingPower.get();
+            power.setCost(powerCreateUsageRequestDto.getUsageAmount());
+        } else { // 기존 데이터가 없을 경우 새로 생성
+            power = PowerConverter.UsageRequestDtotoPower(user, powerCreateUsageRequestDto);
         }
 
         return powerRepository.save(power);
@@ -78,5 +96,25 @@ public class PowerService {
         return powers.stream()
                 .map(power -> new PowerResponseDto.PowerGetAllResponseDto(power.getYear(), power.getMonth(), power.getCost(), power.getUsageAmount()))
                 .collect(Collectors.toList());
+    }
+
+    public Power createPower(Long userId, PowerRequestDto.PowerCreateRequestDto powerCreateRequestDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        int year = powerCreateRequestDto.getYear();
+        int month = powerCreateRequestDto.getMonth();
+        Optional<Power> existingPower = powerRepository.findByYearAndMonthAndUser(year, month, user);
+
+        Power power;
+        if (existingPower.isPresent()) { // 기존 데이터가 있을 경우 업데이트
+            power = existingPower.get();
+            power.setCost(powerCreateRequestDto.getCost());
+            power.setUsageAmount(powerCreateRequestDto.getUsageAmount());
+        } else { // 기존 데이터가 없을 경우 새로 생성
+            power = PowerConverter.toPower(user, powerCreateRequestDto);
+        }
+
+        return powerRepository.save(power);
     }
 }

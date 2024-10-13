@@ -17,9 +17,9 @@ public class Power extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "power_id")
     private Long powerId;
-    @Column(nullable = false)
+    @Column
     private int usageAmount;
-    @Column(nullable = false)
+    @Column
     private int cost;
     @Column(nullable = false)
     private int year;

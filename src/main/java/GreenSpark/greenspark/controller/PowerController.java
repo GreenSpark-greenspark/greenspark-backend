@@ -20,15 +20,26 @@ public class PowerController {
 
     private final PowerService powerService;
 
-    @PostMapping(value = "/power/{userId}")
-    public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createPower(
+    @PostMapping(value = "/power/cost/{userId}")
+    public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createCostPower(
             @PathVariable Long userId,
-            @RequestBody PowerRequestDto.PowerCreateRequestDto powerCreateRequestDto){
-        Power power = powerService.createPower(userId, powerCreateRequestDto);
+            @RequestBody PowerRequestDto.PowerCreateCostRequestDto powerCreateCostRequestDto){
+        Power power = powerService.createCostPower(userId, powerCreateCostRequestDto);
         Long createdUserId = power.getUser().getUserId();
         PowerResponseDto.PowerCreateResponseDto responseDto = PowerConverter.toPowerCreateResponseDto(createdUserId);
 
-        return DataResponseDto.of(responseDto, "전력 입력을 완료했습니다.");
+        return DataResponseDto.of(responseDto, "전기요금 입력을 완료했습니다.");
+    }
+
+    @PostMapping(value = "/power/usage/{userId}")
+    public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createUsagePower(
+            @PathVariable Long userId,
+            @RequestBody PowerRequestDto.PowerCreateUsageRequestDto powerCreateUsageRequestDto){
+        Power power = powerService.createUsagePower(userId, powerCreateUsageRequestDto);
+        Long createdUserId = power.getUser().getUserId();
+        PowerResponseDto.PowerCreateResponseDto responseDto = PowerConverter.toPowerCreateResponseDto(createdUserId);
+
+        return DataResponseDto.of(responseDto, "전력사용량 입력을 완료했습니다.");
     }
 
     @GetMapping(value = "/power/{userId}")
@@ -46,4 +57,15 @@ public class PowerController {
         return DataResponseDto.of(powerList, "해당 유저의 모든 파워 정보를 조회했습니다.");
     }
 
+    // 전기요금, 전력사용량 2개 한 번에 입력받는 API(사용하지 않음)
+    @PostMapping(value = "/power/{userId}")
+    public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createPower(
+            @PathVariable Long userId,
+            @RequestBody PowerRequestDto.PowerCreateRequestDto powerCreateRequestDto){
+        Power power = powerService.createPower(userId, powerCreateRequestDto);
+        Long createdUserId = power.getUser().getUserId();
+        PowerResponseDto.PowerCreateResponseDto responseDto = PowerConverter.toPowerCreateResponseDto(createdUserId);
+
+        return DataResponseDto.of(responseDto, "전력 입력을 완료했습니다.");
+    }
 }
