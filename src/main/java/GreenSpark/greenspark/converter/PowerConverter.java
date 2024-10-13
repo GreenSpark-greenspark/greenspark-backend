@@ -26,4 +26,20 @@ public class PowerConverter {
                 .userId(userId)
                 .build();
     }
+    public static Power CostRequestDtotoPower(User user, PowerRequestDto.PowerCreateCostRequestDto powerCreateCostRequestDto){
+        return Power.builder()
+                .year(powerCreateCostRequestDto.getYear())
+                .month(powerCreateCostRequestDto.getMonth())
+                .cost(powerCreateCostRequestDto.getCost())
+                .user(user)
+                .build();
+    }
+    public static Power UsageRequestDtotoPower(User user, PowerRequestDto.PowerCreateUsageRequestDto powerCreateUsageRequestDto){
+        return Power.builder()
+                .year(powerCreateUsageRequestDto.getYear())
+                .month(powerCreateUsageRequestDto.getMonth())
+                .usageAmount(powerCreateUsageRequestDto.getUsageAmount())
+                .user(user)
+                .build();
+    }
 }
