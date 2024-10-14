@@ -1,5 +1,6 @@
 package GreenSpark.greenspark.service;
 import GreenSpark.greenspark.domain.enums.ApplianceCategory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -11,13 +12,12 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class AppliancesService {
+    @Value("${api.service-key}") String serviceKey;
 
-    public String Search_appliances_OpenAPI(String modelName, String equipmentName, String companyName) {
+    public String Search_appliances_OpenAPI(String modelName, String equipmentName) {
         String category = ApplianceCategory.getCode(equipmentName);
         StringBuilder result = new StringBuilder();
         String baseURL = "https://apis.data.go.kr/B553530/eep/";
-        String serviceKey = "eAJwVNZRoCSnmJha4K8km53UJWoFBcif8T%2BxkvwxqAYgJp3u8UuGp4bEFP5pafKJYVbw%2FuMYQV71NxEcOTUZbg%3D%3D";
-
         try {
             StringBuilder queryParams = new StringBuilder("serviceKey=" + serviceKey +
                     "&pageNo=1" +
@@ -26,9 +26,6 @@ public class AppliancesService {
 
             if (modelName != null && !modelName.isEmpty()) {
                 queryParams.append("&q2=").append(URLEncoder.encode(modelName, "UTF-8"));
-            }
-            if (companyName != null && !companyName.isEmpty()) {
-                queryParams.append("&q3=").append(URLEncoder.encode(companyName, "UTF-8"));
             }
 
             String fullUrl = baseURL + category + "?" + queryParams;
