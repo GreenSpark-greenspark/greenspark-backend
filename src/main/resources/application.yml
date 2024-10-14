@@ -1,3 +1,5 @@
+api:
+  service-key: ${API_SERVICE_KEY}
 spring:
   datasource:
     url: ${DB_URL}
