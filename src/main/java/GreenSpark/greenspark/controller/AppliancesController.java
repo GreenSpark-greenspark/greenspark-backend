@@ -3,6 +3,8 @@ package GreenSpark.greenspark.controller;
 
 import GreenSpark.greenspark.response.DataResponseDto;
 import GreenSpark.greenspark.service.AppliancesService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,17 +16,29 @@ public class AppliancesController {
     private final AppliancesService appliancesService;
     //가전제품 검색 api
     @GetMapping("/appliances/search")
-    public DataResponseDto<String> searchAppliances(@RequestParam(value = "modelName") String modelName,
-                                            @RequestParam(value = "equipmentName") String equipmentName) {
+    public DataResponseDto<?> searchAppliances(@RequestParam(value = "modelName", required = false) String modelName,
+                                               @RequestParam(value = "equipmentName", required = false) String equipmentName) {
+        String jsonResponse = appliancesService.Search_appliances_OpenAPI(modelName, equipmentName);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonResponse);
+            int totalCount = rootNode.path("response").path("body").path("totalCount").asInt();
 
-        String jsonResponse=appliancesService.Search_appliances_OpenAPI(modelName,equipmentName);
-        return DataResponseDto.of(jsonResponse, "가전제품 검색 결과를 성공적으로 조회했습니다.");
+            if (totalCount == 0) {
+                return DataResponseDto.of(null, "검색 결과가 없습니다.");
+            }
 
+            return DataResponseDto.of(jsonResponse, "가전제품 검색 결과를 성공적으로 조회했습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DataResponseDto.of(null, "데이터 처리 중 오류가 발생했습니다.");
+        }
     }
 
     //내 가전제품 추가하기 api
 //    @PostMapping("api/appliances/{userId}/{applianceId}")
-//    public ResponseEntity<String> addAppliance(@PathVariable Long userId, @PathVariable String applianceId) {
+//    public DataResponseDto<> addAppliance(@PathVariable Long userId, @PathVariable String applianceId) {
 //
 //    }
 
