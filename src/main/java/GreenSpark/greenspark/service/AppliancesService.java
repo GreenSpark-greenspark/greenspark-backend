@@ -56,4 +56,8 @@ public class AppliancesService {
         }
         return result.toString();
     }
+
+//    public void Add_Appliances(Long userid, String applianceId){
+//
+//    }
 }
