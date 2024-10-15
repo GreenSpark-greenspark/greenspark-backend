@@ -1,5 +1,11 @@
 package GreenSpark.greenspark.service;
+import GreenSpark.greenspark.domain.Appliance;
+import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.domain.enums.ApplianceCategory;
+import GreenSpark.greenspark.dto.ApplianceDto;
+import GreenSpark.greenspark.repository.AppliancesRepository;
+import GreenSpark.greenspark.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +16,13 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+@RequiredArgsConstructor
 @Service
 public class AppliancesService {
+    private final UserRepository userRepository;
+    private final AppliancesRepository applianceRepository;
+
+
     @Value("${api.service-key}") String serviceKey;
 
     public String Search_appliances_OpenAPI(String modelName, String equipmentName) {
@@ -57,7 +68,17 @@ public class AppliancesService {
         return result.toString();
     }
 
-//    public void Add_Appliances(Long userid, String applianceId){
-//
-//    }
+    public void Add_Appliances(Long userId, ApplianceDto applianceDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+
+        Appliance appliance = Appliance.builder()
+                .modelTerm(applianceDto.getModelTerm())
+                .grade(applianceDto.getGrade())
+                .matchTerm(applianceDto.getMatchTerm())
+                .user(user)
+                .build();
+        applianceRepository.save(appliance);
+
+    }
 }

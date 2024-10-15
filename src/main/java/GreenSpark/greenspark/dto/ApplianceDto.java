@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-class ApplianceDto {
+public class ApplianceDto {
     private String modelTerm;
     private String grade;
     private String matchTerm;
