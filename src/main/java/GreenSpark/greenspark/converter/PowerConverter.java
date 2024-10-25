@@ -7,6 +7,8 @@ import GreenSpark.greenspark.dto.PowerResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class PowerConverter {
@@ -40,6 +42,12 @@ public class PowerConverter {
                 .month(powerCreateUsageRequestDto.getMonth())
                 .usageAmount(powerCreateUsageRequestDto.getUsageAmount())
                 .user(user)
+                .build();
+    }
+    public static PowerResponseDto.PowerGetLastMonthPowerResponseDto toPowerGetLastMonthPowerResponseDto(int lastMonthCost, int costDifference){
+        return PowerResponseDto.PowerGetLastMonthPowerResponseDto.builder()
+                .lastMonthCost(lastMonthCost)
+                .costDifference(costDifference)
                 .build();
     }
 }
