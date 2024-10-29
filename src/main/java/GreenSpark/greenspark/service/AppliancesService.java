@@ -1,4 +1,5 @@
 package GreenSpark.greenspark.service;
+import GreenSpark.greenspark.converter.ApplicationConverter;
 import GreenSpark.greenspark.domain.Appliance;
 import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.domain.enums.ApplianceCategory;
@@ -15,6 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -80,5 +83,16 @@ public class AppliancesService {
                 .build();
         applianceRepository.save(appliance);
 
+    }
+
+    public List<ApplianceDto.ApplianceDataResponseDto> getUserAppliances(Long userId) {
+        List<Appliance> appliances = applianceRepository.findByUser_UserId(userId);
+        return appliances.stream()
+                .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
+                        .applianceId(appliance.getApplianceId()) // 가전제품 ID
+                        .grade(appliance.getGrade()) // 효율 등급
+                        .matchTerm(appliance.getMatchTerm()) // 기자재 명칭
+                        .build())
+                .collect(Collectors.toList());
     }
 }

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -51,7 +53,7 @@ public class AppliancesController {
     }
 
     //내 가전제품 상세보기 api
-    @GetMapping("api/appliances/detail/{applianceId}")
+    @GetMapping("/appliances/detail/{applianceId}")
     public DataResponseDto<?> getApplianceDetail(@PathVariable Long applianceId) {
         Appliance appliance=appliancesRepository.findById(applianceId)
                 .orElseThrow(()->new IllegalArgumentException("Invalid applianceId"));
@@ -71,6 +73,12 @@ public class AppliancesController {
             return DataResponseDto.of(null, "데이터 처리 중 오류가 발생했습니다.");
         }
 
+    }
+    //내 가전제품 목록보기 api
+    @GetMapping("/appliances/{userId}")
+    public DataResponseDto<?> getAllAppliances(@PathVariable Long userId) {
+        List<ApplianceDto.ApplianceDataResponseDto> userappliances=appliancesService.getUserAppliances(userId);
+        return DataResponseDto.of(userappliances,"가전제품 목록을 조회했습니다.");
     }
 
 
