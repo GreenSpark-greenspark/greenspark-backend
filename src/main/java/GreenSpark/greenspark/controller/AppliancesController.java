@@ -94,15 +94,16 @@ public class AppliancesController {
     }
 
     @GetMapping("api/appliances/preview/{userId}")
-    public List<ApplianceDto.ApplianceDataResponseDto> getRecentlyUpdatedAppliances(Long userId) {
+    public DataResponseDto<?> getRecentlyUpdatedAppliances(Long userId) {
         List<Appliance> recentAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
 
-        return recentAppliances.stream()
+        List<ApplianceDto.ApplianceDataResponseDto> recentAppliance= recentAppliances.stream()
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
                         .matchTerm(appliance.getMatchTerm())
                         .build())
                 .collect(Collectors.toList());
+        return DataResponseDto.of(recentAppliance,"가전제품 미리보기가 조회되었습니다.");
     }
 }
