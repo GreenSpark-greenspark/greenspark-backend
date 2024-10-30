@@ -44,10 +44,10 @@ public class PowerConverter {
                 .user(user)
                 .build();
     }
-    public static PowerResponseDto.PowerGetLastMonthPowerResponseDto toPowerGetLastMonthPowerResponseDto(int lastMonthCost, int costDifference){
+    public static PowerResponseDto.PowerGetLastMonthPowerResponseDto toPowerGetLastMonthPowerResponseDto(int lastMonthCost, int monthBeforeLastCost){
         return PowerResponseDto.PowerGetLastMonthPowerResponseDto.builder()
                 .lastMonthCost(lastMonthCost)
-                .costDifference(costDifference)
+                .monthBeforeLastCost(monthBeforeLastCost)
                 .build();
     }
 }
