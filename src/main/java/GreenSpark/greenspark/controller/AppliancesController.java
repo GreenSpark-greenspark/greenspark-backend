@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -90,5 +91,18 @@ public class AppliancesController {
             return DataResponseDto.of(new ApplianceDto.AppliancesHistoryResponse(history, today),"가전제품 히스토리 목록을 조회했습니다.");
         }
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
+    }
+
+    @GetMapping("api/appliances/preview/{userId}")
+    public List<ApplianceDto.ApplianceDataResponseDto> getRecentlyUpdatedAppliances(Long userId) {
+        List<Appliance> recentAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
+
+        return recentAppliances.stream()
+                .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
+                        .applianceId(appliance.getApplianceId())
+                        .grade(appliance.getGrade())
+                        .matchTerm(appliance.getMatchTerm())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

@@ -22,7 +22,7 @@ public class ApplianceDto {
     @AllArgsConstructor
     @Builder
     public static class ApplianceDataResponseDto {
-        private Long applianceId;  // 가전제품 ID 추가
+        private Long applianceId;
         private String grade;
         private String matchTerm;
     }
