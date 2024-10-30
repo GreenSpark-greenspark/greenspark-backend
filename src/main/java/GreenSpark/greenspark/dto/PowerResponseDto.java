@@ -44,7 +44,7 @@ public class PowerResponseDto {
     public static class PowerGetLastMonthPowerResponseDto {
         @JsonProperty("last_month_cost")
         private int lastMonthCost;
-        @JsonProperty("cost_difference")
-        private int costDifference;
+        @JsonProperty("month_before_last_cost")
+        private int monthBeforeLastCost;
     }
 }

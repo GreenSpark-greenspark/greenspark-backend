@@ -73,6 +73,6 @@ public class PowerController {
     public DataResponseDto<PowerResponseDto.PowerGetLastMonthPowerResponseDto> getLastMonthPower(
             @PathVariable Long userId){
         PowerResponseDto.PowerGetLastMonthPowerResponseDto lastMonthList = powerService.getLastMonthPower(userId);
-        return DataResponseDto.of(lastMonthList, "해당 유저의 저번달 요금과 증감을 조회했습니다.");
+        return DataResponseDto.of(lastMonthList, "해당 유저의 저번달 요금과 저저번달 요금을 조회했습니다.");
     }
 }

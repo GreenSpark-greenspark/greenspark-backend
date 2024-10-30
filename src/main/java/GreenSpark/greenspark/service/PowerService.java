@@ -133,23 +133,14 @@ public class PowerService {
         int monthBeforeLast = lastMonth == 1 ? 12 : lastMonth - 1; // 저번달이 1월이면 저저번달은 12월
 
         Power lastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth)
-                .orElseThrow(() -> new EntityNotFoundException("저번 달 요금 데이터를 찾을 수 없습니다."));
-
-        if (lastMonthPower.getCost() == 0) {
-            throw new IllegalArgumentException("저번 달 요금 데이터가 존재하지 않습니다.");
-        }
+                .orElseThrow(() -> new EntityNotFoundException("저번 달 파워를 찾을 수 없습니다."));
 
         Power monthBeforeLastPower = powerRepository.findByUserAndYearAndMonth(user, monthBeforeLastYear, monthBeforeLast)
-                .orElseThrow(() -> new EntityNotFoundException("저저번 달 요금 데이터를 찾을 수 없습니다."));
-
-        if (monthBeforeLastPower.getCost() == 0) {
-            throw new IllegalArgumentException("저저번 달 요금 데이터가 존재하지 않습니다.");
-        }
+                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
 
         int lastMonthCost = lastMonthPower.getCost();
         int monthBeforeLastCost = monthBeforeLastPower.getCost();
-        int costDifference = lastMonthCost - monthBeforeLastCost;
 
-        return PowerConverter.toPowerGetLastMonthPowerResponseDto(lastMonthCost, costDifference);
+        return PowerConverter.toPowerGetLastMonthPowerResponseDto(lastMonthCost, monthBeforeLastCost);
     }
 }
