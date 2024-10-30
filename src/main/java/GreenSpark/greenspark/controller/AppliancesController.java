@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -81,5 +82,13 @@ public class AppliancesController {
         return DataResponseDto.of(userappliances,"가전제품 목록을 조회했습니다.");
     }
 
-
+    @GetMapping("/appliances/history{userId}")
+    public DataResponseDto<?> getApplianceHistory(@PathVariable Long userId) {
+        LocalDate today=LocalDate.now();
+        if(today.getDayOfMonth()==1){
+            List<ApplianceDto.AppliancesHistoryResponseDto> history=appliancesService.get_Grade_Upgrade_Appliances(userId);
+            return DataResponseDto.of(history,"가전제품 히스토리 목록을 조회했습니다.");
+        }
+        return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
+    }
 }
