@@ -23,4 +23,16 @@ public class ApplianceDto {
         private String grade;
         private String matchTerm;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AppliancesHistoryResponseDto{
+        private Long applianceId;
+        private String previousGrade;
+        private String nextGrade;
+        private String matchTerm;
+    }
 }

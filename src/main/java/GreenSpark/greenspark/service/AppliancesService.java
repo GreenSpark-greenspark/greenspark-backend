@@ -6,6 +6,8 @@ import GreenSpark.greenspark.domain.enums.ApplianceCategory;
 import GreenSpark.greenspark.dto.ApplianceDto;
 import GreenSpark.greenspark.repository.AppliancesRepository;
 import GreenSpark.greenspark.repository.UserRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -95,4 +100,39 @@ public class AppliancesService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public List<ApplianceDto.AppliancesHistoryResponseDto> get_Grade_Upgrade_Appliances(Long userId) {
+        List<Appliance> appliances = applianceRepository.findByUser_UserId(userId);
+        List<ApplianceDto.AppliancesHistoryResponseDto> updatedAppliances = appliances.stream()
+                .map(appliance -> {
+                    String apiResponse = Search_appliances_OpenAPI(appliance.getModelTerm(), appliance.getMatchTerm());
+                    String updatedGrade = parseGradeFromApiResponse(apiResponse);
+                    if (updatedGrade != null && !appliance.getGrade().equals(updatedGrade)) {
+                        String previousGrade=appliance.getGrade();
+                        appliance.setGrade(updatedGrade);
+                        applianceRepository.save(appliance);
+                        return new ApplianceDto.AppliancesHistoryResponseDto(appliance.getApplianceId(), previousGrade, updatedGrade, appliance.getMatchTerm());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return updatedAppliances;
+    }
+    private String parseGradeFromApiResponse(String apiResponse) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(apiResponse);
+            JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
+
+            if (itemsNode.isArray() && itemsNode.size() > 0) {
+                return itemsNode.get(0).path("GRADE").asText(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
