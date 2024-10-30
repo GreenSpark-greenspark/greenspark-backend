@@ -9,6 +9,7 @@ import GreenSpark.greenspark.repository.PowerRepository;
 import GreenSpark.greenspark.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -142,5 +143,13 @@ public class PowerService {
         int monthBeforeLastCost = monthBeforeLastPower.getCost();
 
         return PowerConverter.toPowerGetLastMonthPowerResponseDto(lastMonthCost, monthBeforeLastCost);
+    }
+
+    // 매년 1월 1일 00:00에 실행되도록 스케줄링 설정
+    @Scheduled(cron = "0 0 0 1 1 *")
+    public void deleteOldRecordsOnNewYear() {
+        int thresholdYear = LocalDate.now().getYear() - 3;
+        powerRepository.deleteByYearLessThanEqual(thresholdYear);
+        System.out.println("3년 이상 지난 데이터가 삭제되었습니다.");
     }
 }
