@@ -109,7 +109,7 @@ public class AppliancesService {
                     String updatedGrade = parseGradeFromApiResponse(apiResponse);
                     if (updatedGrade != null && !appliance.getGrade().equals(updatedGrade)) {
                         String previousGrade=appliance.getGrade();
-                        appliance.setGrade(updatedGrade);
+                        appliance.updateGrade(updatedGrade);
                         applianceRepository.save(appliance);
                         return new ApplianceDto.AppliancesHistoryResponseDto(appliance.getApplianceId(), previousGrade, updatedGrade, appliance.getMatchTerm());
                     }
