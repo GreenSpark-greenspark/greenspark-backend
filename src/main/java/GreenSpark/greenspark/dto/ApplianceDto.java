@@ -2,6 +2,9 @@ package GreenSpark.greenspark.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,5 +37,15 @@ public class ApplianceDto {
         private String previousGrade;
         private String nextGrade;
         private String matchTerm;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AppliancesHistoryResponse{
+        private List<AppliancesHistoryResponseDto> history;
+        private LocalDate callDate;
     }
 }

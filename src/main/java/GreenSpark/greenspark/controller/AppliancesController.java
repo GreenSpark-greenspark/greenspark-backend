@@ -87,7 +87,7 @@ public class AppliancesController {
         LocalDate today=LocalDate.now();
         if(today.getDayOfMonth()==1){
             List<ApplianceDto.AppliancesHistoryResponseDto> history=appliancesService.get_Grade_Upgrade_Appliances(userId);
-            return DataResponseDto.of(history,"가전제품 히스토리 목록을 조회했습니다.");
+            return DataResponseDto.of(new ApplianceDto.AppliancesHistoryResponse(history, today),"가전제품 히스토리 목록을 조회했습니다.");
         }
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }

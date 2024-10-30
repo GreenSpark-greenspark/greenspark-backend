@@ -4,6 +4,7 @@ import GreenSpark.greenspark.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,4 +31,13 @@ public class Appliance extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    private LocalDate updateDate;
+    private Boolean isUpdated = false;
+
+    public void updateGrade(String newGrade) {
+        this.grade = newGrade;
+        this.updateDate = LocalDate.now();
+        this.isUpdated = true;
+    }
 }
