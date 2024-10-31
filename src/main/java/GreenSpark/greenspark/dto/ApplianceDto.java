@@ -25,6 +25,7 @@ public class ApplianceDto {
         private Long applianceId;
         private String grade;
         private String matchTerm;
+        private boolean isUpdated;
     }
 
     @Getter

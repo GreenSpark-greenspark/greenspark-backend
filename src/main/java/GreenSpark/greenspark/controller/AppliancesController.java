@@ -85,7 +85,7 @@ public class AppliancesController {
         return DataResponseDto.of(userappliances,"가전제품 목록을 조회했습니다.");
     }
 
-    @GetMapping("/appliances/history{userId}")
+    @GetMapping("/appliances/history/{userId}")
     public DataResponseDto<?> getApplianceHistory(@PathVariable Long userId) {
         LocalDate today=LocalDate.now();
         if(today.getDayOfMonth()==1){
@@ -95,7 +95,7 @@ public class AppliancesController {
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }
 
-@GetMapping("api/appliances/preview/{userId}")
+@GetMapping("/appliances/preview/{userId}")
 public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId) {
     List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
     List<Appliance> allAppliances = appliancesRepository.findByUser_UserId(userId);
@@ -111,6 +111,7 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
                         .matchTerm(appliance.getMatchTerm())
+                        .isUpdated(appliance.getIsUpdated())
                         .build())
                 .collect(Collectors.toList()));
         resultDtos.addAll(nonUpdatedAppliances.stream()
@@ -120,6 +121,7 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
                         .matchTerm(appliance.getMatchTerm())
+                        .isUpdated(appliance.getIsUpdated())
                         .build())
                 .collect(Collectors.toList()));
     } else {
@@ -130,6 +132,7 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
                         .matchTerm(appliance.getMatchTerm())
+                        .isUpdated(appliance.getIsUpdated())
                         .build())
                 .collect(Collectors.toList()));
     }
