@@ -84,6 +84,7 @@ public class AppliancesService {
                 .modelTerm(applianceDto.getModelTerm())
                 .grade(applianceDto.getGrade())
                 .matchTerm(applianceDto.getMatchTerm())
+                .isUpdated(false)
                 .user(user)
                 .build();
         applianceRepository.save(appliance);
