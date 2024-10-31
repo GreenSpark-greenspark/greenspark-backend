@@ -95,18 +95,16 @@ public class AppliancesController {
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }
 
-@GetMapping("/appliances/preview/{userId}")
-public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId) {
-    List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
-    List<Appliance> allAppliances = appliancesRepository.findByUser_UserId(userId);
-    List<Appliance> nonUpdatedAppliances = allAppliances.stream()
+    @GetMapping("/appliances/preview/{userId}")
+    public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId) {
+        List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
+        List<Appliance> allAppliances = appliancesRepository.findByUser_UserId(userId);
+        List<Appliance> nonUpdatedAppliances = allAppliances.stream()
             .filter(appliance -> !updatedAppliances.contains(appliance))
             .collect(Collectors.toList());
-
-    List<ApplianceDto.ApplianceDataResponseDto> resultDtos = new ArrayList<>();
-
-    if (!updatedAppliances.isEmpty()) {
-        resultDtos.addAll(updatedAppliances.stream()
+        List<ApplianceDto.ApplianceDataResponseDto> resultDtos = new ArrayList<>();
+        if (!updatedAppliances.isEmpty()) {
+            resultDtos.addAll(updatedAppliances.stream()
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
@@ -114,7 +112,7 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .isUpdated(appliance.getIsUpdated())
                         .build())
                 .collect(Collectors.toList()));
-        resultDtos.addAll(nonUpdatedAppliances.stream()
+            resultDtos.addAll(nonUpdatedAppliances.stream()
                 .sorted(Comparator.comparing(Appliance::getApplianceId))
                 .limit(3 - updatedAppliances.size())
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
@@ -124,8 +122,8 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .isUpdated(appliance.getIsUpdated())
                         .build())
                 .collect(Collectors.toList()));
-    } else {
-        resultDtos.addAll(nonUpdatedAppliances.stream()
+        } else {
+            resultDtos.addAll(nonUpdatedAppliances.stream()
                 .sorted(Comparator.comparing(Appliance::getApplianceId))
                 .limit(3)
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
@@ -136,6 +134,6 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .build())
                 .collect(Collectors.toList()));
     }
-    return DataResponseDto.of(resultDtos, "가전제품 미리보기가 조회되었습니다.");
+        return DataResponseDto.of(resultDtos, "가전제품 미리보기가 조회되었습니다.");
 }
 }
