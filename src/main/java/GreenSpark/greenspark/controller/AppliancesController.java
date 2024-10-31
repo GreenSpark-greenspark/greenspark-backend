@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,17 +95,44 @@ public class AppliancesController {
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }
 
-    @GetMapping("api/appliances/preview/{userId}")
-    public DataResponseDto<?> getRecentlyUpdatedAppliances(Long userId) {
-        List<Appliance> recentAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
+@GetMapping("api/appliances/preview/{userId}")
+public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId) {
+    List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
+    List<Appliance> allAppliances = appliancesRepository.findByUser_UserId(userId);
+    List<Appliance> nonUpdatedAppliances = allAppliances.stream()
+            .filter(appliance -> !updatedAppliances.contains(appliance))
+            .collect(Collectors.toList());
 
-        List<ApplianceDto.ApplianceDataResponseDto> recentAppliance= recentAppliances.stream()
+    List<ApplianceDto.ApplianceDataResponseDto> resultDtos = new ArrayList<>();
+
+    if (!updatedAppliances.isEmpty()) {
+        resultDtos.addAll(updatedAppliances.stream()
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
                         .matchTerm(appliance.getMatchTerm())
                         .build())
-                .collect(Collectors.toList());
-        return DataResponseDto.of(recentAppliance,"가전제품 미리보기가 조회되었습니다.");
+                .collect(Collectors.toList()));
+        resultDtos.addAll(nonUpdatedAppliances.stream()
+                .sorted(Comparator.comparing(Appliance::getApplianceId))
+                .limit(3 - updatedAppliances.size())
+                .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
+                        .applianceId(appliance.getApplianceId())
+                        .grade(appliance.getGrade())
+                        .matchTerm(appliance.getMatchTerm())
+                        .build())
+                .collect(Collectors.toList()));
+    } else {
+        resultDtos.addAll(nonUpdatedAppliances.stream()
+                .sorted(Comparator.comparing(Appliance::getApplianceId))
+                .limit(3)
+                .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
+                        .applianceId(appliance.getApplianceId())
+                        .grade(appliance.getGrade())
+                        .matchTerm(appliance.getMatchTerm())
+                        .build())
+                .collect(Collectors.toList()));
     }
+    return DataResponseDto.of(resultDtos, "가전제품 미리보기가 조회되었습니다.");
+}
 }

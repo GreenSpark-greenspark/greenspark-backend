@@ -48,4 +48,15 @@ public class ApplianceDto {
         private List<AppliancesHistoryResponseDto> history;
         private LocalDate callDate;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AppliancePreviewResponseDto {
+        private List<ApplianceDataResponseDto> updatedAppliances;
+        private List<ApplianceDataResponseDto> nonUpdatedAppliances;
+
+    }
 }
