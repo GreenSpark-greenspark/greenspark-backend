@@ -25,6 +25,7 @@ public class ApplianceDto {
         private Long applianceId;
         private String grade;
         private String matchTerm;
+        private boolean isUpdated;
     }
 
     @Getter
@@ -47,5 +48,16 @@ public class ApplianceDto {
     public static class AppliancesHistoryResponse{
         private List<AppliancesHistoryResponseDto> history;
         private LocalDate callDate;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AppliancePreviewResponseDto {
+        private List<ApplianceDataResponseDto> updatedAppliances;
+        private List<ApplianceDataResponseDto> nonUpdatedAppliances;
+
     }
 }

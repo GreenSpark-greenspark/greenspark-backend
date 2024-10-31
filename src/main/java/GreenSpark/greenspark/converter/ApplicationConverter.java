@@ -8,7 +8,8 @@ public class ApplicationConverter {
         return new ApplianceDto.ApplianceDataResponseDto(
                 appliance.getApplianceId(),
                 appliance.getGrade(),
-                appliance.getMatchTerm()
+                appliance.getMatchTerm(),
+                appliance.getIsUpdated()
         );
     }
 }
