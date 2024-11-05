@@ -1,4 +1,4 @@
-package studio.stew.config;
+package GreenSpark.greenspark.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
