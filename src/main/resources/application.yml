@@ -2,7 +2,7 @@ api:
   service-key: ${API_SERVICE_KEY}
 spring:
   datasource:
-    url: ${DB_URL}
+    url: jdbc:mysql://greenspark-db.cpeammio2vo7.ap-northeast-2.rds.amazonaws.com:3306/greenspark_db
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
