@@ -75,4 +75,11 @@ public class PowerController {
         PowerResponseDto.PowerGetLastMonthPowerResponseDto lastMonthList = powerService.getLastMonthPower(userId);
         return DataResponseDto.of(lastMonthList, "해당 유저의 저번달 요금과 저저번달 요금을 조회했습니다.");
     }
+
+    @GetMapping(value = "/power/expect/{userId}")
+    public DataResponseDto<PowerResponseDto.PowerGetExpectedCostResponseDto> getExpectedCost(
+            @PathVariable Long userId){
+        PowerResponseDto.PowerGetExpectedCostResponseDto lastMonthList = powerService.getExpectedCost(userId);
+        return DataResponseDto.of(lastMonthList, "해당 유저의 예상 요금과 저번달 요금을 조회했습니다.");
+    }
 }

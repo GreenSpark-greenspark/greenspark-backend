@@ -9,11 +9,15 @@ import GreenSpark.greenspark.repository.PowerRepository;
 import GreenSpark.greenspark.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -143,6 +147,47 @@ public class PowerService {
         int monthBeforeLastCost = monthBeforeLastPower.getCost();
 
         return PowerConverter.toPowerGetLastMonthPowerResponseDto(lastMonthCost, monthBeforeLastCost);
+    }
+
+    public PowerResponseDto.PowerGetExpectedCostResponseDto getExpectedCost(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+        int currentMonth = now.getMonthValue();
+
+        int lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear; // 1월이면 저번달의 년도를 올해 - 1 아니면 그대로
+        int lastMonth = currentMonth == 1 ? 12 : currentMonth - 1; // 1월이면 저번달은 12월 아니면 -1
+
+        Power lastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth)
+                .orElseThrow(() -> new EntityNotFoundException("저번 달 파워를 찾을 수 없습니다."));
+
+        int lastMonthCost = lastMonthPower.getCost();
+
+        List<Power> userPowers = powerRepository.findAllByUser(user);
+
+        // FastAPI에 보낼 JSON request 생성
+        List<PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto> expectedCostRequest = userPowers.stream()
+                .map(power -> new PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto(
+                        power.getYear() + "-" + String.format("%02d", power.getMonth()) + "-01", // "yyyy-MM-dd" 형식의 문자열
+                        power.getCost()
+                ))
+                .toList();
+
+        // FastAPI와 통신하기 위한 세팅
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<List<PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto>> requestEntity = new HttpEntity<>(expectedCostRequest, headers);
+
+        String url = "http://localhost:8000/ml"; // FastAPI 서버 URL 확인
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {});
+
+        int expectedCost = ((Number) response.getBody().get("predicted_cost")).intValue();
+
+        return PowerConverter.toGetExpectedCostResponseDto(expectedCost, lastMonthCost);
     }
 
     // 매년 1월 1일 00:00에 실행되도록 스케줄링 설정

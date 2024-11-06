@@ -50,4 +50,11 @@ public class PowerConverter {
                 .monthBeforeLastCost(monthBeforeLastCost)
                 .build();
     }
+
+    public static PowerResponseDto.PowerGetExpectedCostResponseDto toGetExpectedCostResponseDto(int expectedCost, int lastMonthCost){
+        return PowerResponseDto.PowerGetExpectedCostResponseDto.builder()
+                .expectedCost(expectedCost)
+                .lastMonthCost(lastMonthCost)
+                .build();
+    }
 }

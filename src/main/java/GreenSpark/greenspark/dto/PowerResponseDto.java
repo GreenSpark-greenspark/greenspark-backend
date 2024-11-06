@@ -47,4 +47,15 @@ public class PowerResponseDto {
         @JsonProperty("month_before_last_cost")
         private int monthBeforeLastCost;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class PowerGetExpectedCostResponseDto {
+        @JsonProperty("expected_cost")
+        private int expectedCost;
+        @JsonProperty("last_month_cost")
+        private int lastMonthCost;
+    }
 }
