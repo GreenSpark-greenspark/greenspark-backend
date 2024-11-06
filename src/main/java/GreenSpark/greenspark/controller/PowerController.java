@@ -57,6 +57,20 @@ public class PowerController {
         return DataResponseDto.of(powerList, "해당 유저의 모든 파워 정보를 조회했습니다.");
     }
 
+    @GetMapping(value = "/power/last-month/{userId}")
+    public DataResponseDto<PowerResponseDto.PowerGetLastMonthPowerResponseDto> getLastMonthPower(
+            @PathVariable Long userId){
+        PowerResponseDto.PowerGetLastMonthPowerResponseDto lastMonthResponse = powerService.getLastMonthPower(userId);
+        return DataResponseDto.of(lastMonthResponse, "해당 유저의 저번달 요금과 저저번달 요금을 조회했습니다.");
+    }
+
+    @GetMapping(value = "/power/expect/{userId}")
+    public DataResponseDto<PowerResponseDto.PowerGetExpectedCostResponseDto> getExpectedCost(
+            @PathVariable Long userId){
+        PowerResponseDto.PowerGetExpectedCostResponseDto expectedCostResponse = powerService.getExpectedCost(userId);
+        return DataResponseDto.of(expectedCostResponse, "해당 유저의 예상 요금과 저번달 요금을 조회했습니다.");
+    }
+
     // 전기요금, 전력사용량 2개 한 번에 입력받는 API(사용하지 않음)
     @PostMapping(value = "/power/{userId}")
     public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createPower(
@@ -67,19 +81,5 @@ public class PowerController {
         PowerResponseDto.PowerCreateResponseDto responseDto = PowerConverter.toPowerCreateResponseDto(createdUserId);
 
         return DataResponseDto.of(responseDto, "전력 입력을 완료했습니다.");
-    }
-
-    @GetMapping(value = "/power/last-month/{userId}")
-    public DataResponseDto<PowerResponseDto.PowerGetLastMonthPowerResponseDto> getLastMonthPower(
-            @PathVariable Long userId){
-        PowerResponseDto.PowerGetLastMonthPowerResponseDto lastMonthList = powerService.getLastMonthPower(userId);
-        return DataResponseDto.of(lastMonthList, "해당 유저의 저번달 요금과 저저번달 요금을 조회했습니다.");
-    }
-
-    @GetMapping(value = "/power/expect/{userId}")
-    public DataResponseDto<PowerResponseDto.PowerGetExpectedCostResponseDto> getExpectedCost(
-            @PathVariable Long userId){
-        PowerResponseDto.PowerGetExpectedCostResponseDto lastMonthList = powerService.getExpectedCost(userId);
-        return DataResponseDto.of(lastMonthList, "해당 유저의 예상 요금과 저번달 요금을 조회했습니다.");
     }
 }

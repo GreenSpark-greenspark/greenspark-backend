@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,9 +82,20 @@ public class PowerService {
         );
 
         if ("bill".equalsIgnoreCase(display)) {
-            return powers.stream()
+            PowerResponseDto.PowerGetExpectedCostResponseDto expectedCostResponse = getExpectedCost(userId);
+            int expectedCost = expectedCostResponse.getExpectedCost();
+
+            List<PowerResponseDto.PowerGetDataResponseDto> billList =  powers.stream()
                     .map(power -> new PowerResponseDto.PowerGetDataResponseDto(power.getYear(), power.getMonth(), power.getCost()))
-                    .collect(Collectors.toList());
+                    .toList();
+
+            PowerResponseDto.PowerGetDataResponseDto currentData =
+                    new PowerResponseDto.PowerGetDataResponseDto(currentYear, currentMonth, expectedCost);
+
+            List<PowerResponseDto.PowerGetDataResponseDto> updatedBillList = new ArrayList<>(billList);
+            updatedBillList.add(currentData);
+
+            return updatedBillList;
         } else if ("usage".equalsIgnoreCase(display)) {
             return powers.stream()
                     .map(power -> new PowerResponseDto.PowerGetDataResponseDto(power.getYear(), power.getMonth(), power.getUsageAmount()))
