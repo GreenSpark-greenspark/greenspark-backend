@@ -54,7 +54,7 @@ public class PowerService {
         Power power;
         if (existingPower.isPresent()) { // 기존 데이터가 있을 경우 업데이트
             power = existingPower.get();
-            power.setCost(powerCreateUsageRequestDto.getUsageAmount());
+            power.setUsageAmount(powerCreateUsageRequestDto.getUsageAmount());
         } else { // 기존 데이터가 없을 경우 새로 생성
             power = PowerConverter.UsageRequestDtotoPower(user, powerCreateUsageRequestDto);
         }
