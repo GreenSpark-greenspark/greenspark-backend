@@ -82,20 +82,9 @@ public class PowerService {
         );
 
         if ("bill".equalsIgnoreCase(display)) {
-            PowerResponseDto.PowerGetExpectedCostResponseDto expectedCostResponse = getExpectedCost(userId);
-            int expectedCost = expectedCostResponse.getExpectedCost();
-
-            List<PowerResponseDto.PowerGetDataResponseDto> billList =  powers.stream()
+            return powers.stream()
                     .map(power -> new PowerResponseDto.PowerGetDataResponseDto(power.getYear(), power.getMonth(), power.getCost()))
-                    .toList();
-
-            PowerResponseDto.PowerGetDataResponseDto currentData =
-                    new PowerResponseDto.PowerGetDataResponseDto(currentYear, currentMonth, expectedCost);
-
-            List<PowerResponseDto.PowerGetDataResponseDto> updatedBillList = new ArrayList<>(billList);
-            updatedBillList.add(currentData);
-
-            return updatedBillList;
+                    .collect(Collectors.toList());
         } else if ("usage".equalsIgnoreCase(display)) {
             return powers.stream()
                     .map(power -> new PowerResponseDto.PowerGetDataResponseDto(power.getYear(), power.getMonth(), power.getUsageAmount()))
@@ -181,6 +170,8 @@ public class PowerService {
 
         // FastAPI에 보낼 JSON request 생성
         List<PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto> expectedCostRequest = userPowers.stream()
+                // cost가 0이 아닌 경우만 필터링 (cost가 0인 경우는 전력사용량만 입력한 경우이므로)
+                .filter(power -> power.getCost() != 0)
                 .map(power -> new PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto(
                         power.getYear() + "-" + String.format("%02d", power.getMonth()) + "-01", // "yyyy-MM-dd" 형식의 문자열
                         power.getCost()
