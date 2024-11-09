@@ -53,8 +53,8 @@ public class AppliancesService {
             URL url = new URL(fullUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
-            urlConnection.setConnectTimeout(5000);
-            urlConnection.setReadTimeout(5000);
+            urlConnection.setConnectTimeout(50000);
+            urlConnection.setReadTimeout(50000);
 
             int responseCode = urlConnection.getResponseCode();
             System.out.println("API 응답 코드: " + responseCode);
