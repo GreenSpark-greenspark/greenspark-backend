@@ -185,7 +185,7 @@ public class PowerService {
 
         HttpEntity<List<PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto>> requestEntity = new HttpEntity<>(expectedCostRequest, headers);
 
-        String url = "http://localhost:8000/ml"; // FastAPI 서버 URL 확인
+        String url = "http://172.31.15.13:8000/ml"; // FastAPI 서버 URL 확인
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {});
 
         int expectedCost = ((Number) response.getBody().get("predicted_cost")).intValue();
