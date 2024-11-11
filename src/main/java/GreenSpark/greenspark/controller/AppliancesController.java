@@ -9,6 +9,8 @@ import GreenSpark.greenspark.response.DataResponseDto;
 import GreenSpark.greenspark.service.AppliancesService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,24 +61,41 @@ public class AppliancesController {
     //내 가전제품 상세보기 api
     @GetMapping("/appliances/detail/{applianceId}")
     public DataResponseDto<?> getApplianceDetail(@PathVariable Long applianceId) {
-        Appliance appliance=appliancesRepository.findById(applianceId)
-                .orElseThrow(()->new IllegalArgumentException("Invalid applianceId"));
-        String modelName=appliance.getModelTerm();
-        String equipmentName=appliance.getMatchTerm();
+        Appliance appliance = appliancesRepository.findById(applianceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid applianceId"));
+        String modelName = appliance.getModelTerm();
+        String equipmentName = appliance.getMatchTerm();
         String jsonResponse = appliancesService.Search_appliances_OpenAPI(modelName, equipmentName);
         ObjectMapper objectMapper = new ObjectMapper();
+
         try {
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             int totalCount = rootNode.path("response").path("body").path("totalCount").asInt();
+
             if (totalCount == 0) {
                 return DataResponseDto.of(null, "검색 결과가 없습니다.");
             }
-            return DataResponseDto.of(jsonResponse, "가전제품 상세보기를 조회했습니다.");
+            JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
+            ArrayNode filteredItems = objectMapper.createArrayNode();
+
+            for (JsonNode itemNode : itemsNode) {
+                String itemModelName = itemNode.path("MODEL_TERM").asText();
+                if (modelName.equals(itemModelName)) {
+                    filteredItems.add(itemNode);
+                }
+            }
+            ObjectNode responseNode = objectMapper.createObjectNode();
+            responseNode.set("items", filteredItems);
+
+            if (filteredItems.isEmpty()) {
+                return DataResponseDto.of(null, "검색 결과가 없습니다.");
+            }
+
+            return DataResponseDto.of(responseNode.toString(), "가전제품 상세보기를 조회했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return DataResponseDto.of(null, "데이터 처리 중 오류가 발생했습니다.");
         }
-
     }
     //내 가전제품 목록보기 api
     @GetMapping("/appliances/{userId}")
