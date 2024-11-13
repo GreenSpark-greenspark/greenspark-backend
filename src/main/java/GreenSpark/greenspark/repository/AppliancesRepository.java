@@ -13,4 +13,6 @@ public interface AppliancesRepository extends JpaRepository<Appliance, Long> {
     List<Appliance> findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(Long userId, Boolean isUpdated);
 
     Collection<Object> findTop3ByUser_UserIdAndIsUpdatedFalseOrderByApplianceIdDesc(Long userId);
+
+    boolean existsByUser_UserIdAndModelTerm(Long userId, String modelTerm);
 }

@@ -80,6 +80,11 @@ public class AppliancesService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
+        boolean exists = applianceRepository.existsByUser_UserIdAndModelTerm(userId, applianceDto.getModelTerm());
+        if (exists) {
+            throw new IllegalArgumentException("이미 존재하는 가전제품입니다.");
+        }
+
         Appliance appliance = Appliance.builder()
                 .modelTerm(applianceDto.getModelTerm())
                 .grade(applianceDto.getGrade())

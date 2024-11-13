@@ -52,12 +52,16 @@ public class AppliancesController {
         try {
             appliancesService.Add_Appliances(userId, applianceDto);
             return DataResponseDto.of(null, "가전제품이 성공적으로 추가되었습니다.");
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().equals("이미 존재하는 가전제품입니다.")) {
+                return DataResponseDto.of(null, "이미 존재하는 가전제품입니다.");
+            }
+            return DataResponseDto.of(null, "잘못된 사용자 ID입니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return DataResponseDto.of(null, "가전제품 추가 중 오류가 발생했습니다.");
         }
     }
-
     //내 가전제품 상세보기 api
     @GetMapping("/appliances/detail/{applianceId}")
     public DataResponseDto<?> getApplianceDetail(@PathVariable Long applianceId) {
