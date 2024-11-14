@@ -75,11 +75,19 @@ public class PowerService {
         int currentYear = now.getYear();
         int currentMonth = now.getMonthValue();
 
-        List<Power> powers = powerRepository.findAllByUserAndYearBetweenAndMonthBetween(
-                user,
-                currentYear - 1, currentYear, // 작년과 올해
-                1, currentMonth // 1월 ~ 이번 달
-        );
+        // 최근 24개월 전 날짜 계산
+        LocalDate twoYearsAgo = now.minusMonths(24);
+
+        // 데이터베이스에서 해당 사용자의 모든 데이터 가져오기
+        List<Power> allPowers = powerRepository.findAllByUser(user);
+
+        // 최근 2년 이내의 데이터만 필터링
+        List<Power> powers = allPowers.stream()
+                .filter(power -> {
+                    LocalDate powerDate = LocalDate.of(power.getYear(), power.getMonth(), 1);
+                    return (powerDate.isAfter(twoYearsAgo) || powerDate.isEqual(twoYearsAgo)) && powerDate.isBefore(now.plusMonths(1));
+                })
+                .collect(Collectors.toList());
 
         if ("bill".equalsIgnoreCase(display)) {
             return powers.stream()
