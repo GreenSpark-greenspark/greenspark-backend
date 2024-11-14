@@ -17,8 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name(),
                 HttpMethod.PATCH.name(),
-                HttpMethod.DELETE.name())
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                HttpMethod.DELETE.name());
     }
 }
