@@ -8,12 +8,15 @@ public enum ApplianceCategory {
     VACUUM_CLEANER("EEP_05_LIST", "전기진공청소기"),
     DRUM_WASHING_MACHINE("EEP_06_LIST", "전기세탁기(드럼)"),
     FAN("EEP_07_LIST", "선풍기"),
-    AIR_PURIFIER("EEP_08_LIST", "공기청정기"),
-    RICE_COOKER("EEP_11_LIST", "전기밥솥"),
+    AIR_PURIFIER("EEP_08_LIST", "공기청정기 (~24.12.31)"),
     KIMCHI_FRIDGE("EEP_13_LIST", "김치냉장고"),
-    HEATER("EEP_14_LIST", "전기온풍기"),
-    ELECTRIC_STOVE("EEP_15_LIST", "전기스토브"),
-    WATER_PURIFIER("EEP_16_LIST", "전기냉온수기");
+    WATER_PURIFIER("EEP_16_LIST", "전기냉온수기"),
+    TELEVISION("EEP_17_LIST","텔레비전수상기"),
+    DEHUMIDIFIER("EEP_19_LIST","제습기"),
+    ELECTRIC_REFREIGERATOR("EEP_20_LIST","전기냉장고"),
+    ELECTRIC_AIR_CONDITIONER("EEP_28_LIST","전기냉난방기(~2018.10.01 이전)");
+
+
 
     private final String code;
     private final String equipmentName;
