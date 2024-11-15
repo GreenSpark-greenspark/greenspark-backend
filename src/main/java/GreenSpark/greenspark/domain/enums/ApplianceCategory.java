@@ -14,7 +14,9 @@ public enum ApplianceCategory {
     TELEVISION("EEP_17_LIST","텔레비전수상기"),
     DEHUMIDIFIER("EEP_19_LIST","제습기"),
     ELECTRIC_REFREIGERATOR("EEP_20_LIST","전기냉장고"),
-    ELECTRIC_AIR_CONDITIONER("EEP_28_LIST","전기냉난방기(~2018.10.01 이전)");
+    ELECTRIC_AIR_CONDITIONER_1("EEP_28_LIST","전기냉난방기(~2018.10.01 이전)"),
+    ELECTRIC_AIR_CONDITIONER_2("EEP_28_LIST","전기냉난방기");
+
 
 
 
