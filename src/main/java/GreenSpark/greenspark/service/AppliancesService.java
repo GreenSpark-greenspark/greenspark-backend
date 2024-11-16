@@ -96,6 +96,18 @@ public class AppliancesService {
 
     }
 
+    public void deleteAppliance(Long userId, Long applianceId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID입니다."));
+
+        Appliance appliance = applianceRepository.findById(applianceId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 가전제품 ID입니다."));
+
+        if (!appliance.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("해당 가전제품은 사용자의 소유가 아닙니다.");
+        }
+        applianceRepository.delete(appliance);
+    }
     public List<ApplianceDto.ApplianceDataResponseDto> getUserAppliances(Long userId) {
         List<Appliance> appliances = applianceRepository.findByUser_UserId(userId);
         return appliances.stream()
@@ -140,5 +152,6 @@ public class AppliancesService {
         }
         return null;
     }
+
 
 }

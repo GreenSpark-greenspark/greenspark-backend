@@ -62,6 +62,12 @@ public class AppliancesController {
             return DataResponseDto.of(null, "가전제품 추가 중 오류가 발생했습니다.");
         }
     }
+
+    @PostMapping("/appliances/delete/{userId}/{applianceId}")
+    public DataResponseDto<?> deleteAppliance(@PathVariable Long userId, @PathVariable Long applianceId) {
+        appliancesService.deleteAppliance(userId, applianceId);
+        return DataResponseDto.of(null,"해당 가전제품이 삭제되었습니다.");
+    }
     //내 가전제품 상세보기 api
     @GetMapping("/appliances/detail/{applianceId}")
     public DataResponseDto<?> getApplianceDetail(@PathVariable Long applianceId) {
