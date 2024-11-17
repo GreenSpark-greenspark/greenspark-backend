@@ -14,6 +14,12 @@ public class Point extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pointId")
     private Long pointId;
+    @Column(nullable = false)
+    private int after_point;
+    @Column(nullable = false)
+    private int point_amount;
+    @Column(nullable = false)
+    private String event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
