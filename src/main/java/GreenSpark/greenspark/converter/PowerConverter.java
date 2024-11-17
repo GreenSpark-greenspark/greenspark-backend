@@ -44,17 +44,20 @@ public class PowerConverter {
                 .user(user)
                 .build();
     }
-    public static PowerResponseDto.PowerGetLastMonthPowerResponseDto toPowerGetLastMonthPowerResponseDto(int lastMonthCost, int monthBeforeLastCost){
-        return PowerResponseDto.PowerGetLastMonthPowerResponseDto.builder()
-                .lastMonthCost(lastMonthCost)
-                .monthBeforeLastCost(monthBeforeLastCost)
-                .build();
-    }
 
-    public static PowerResponseDto.PowerGetExpectedCostResponseDto toGetExpectedCostResponseDto(int expectedCost, int lastMonthCost){
+    public static PowerResponseDto.PowerGetExpectedCostResponseDto toGetExpectedCostResponseDto(int expectedCost, int lastMonthCost, int twoMonthAgoCost, int threeMonthAgoCost){
         return PowerResponseDto.PowerGetExpectedCostResponseDto.builder()
                 .expectedCost(expectedCost)
                 .lastMonthCost(lastMonthCost)
+                .twoMonthAgoCost(twoMonthAgoCost)
+                .threeMonthsAgoCost(threeMonthAgoCost)
                 .build();
     }
+
+//    public static PowerResponseDto.PowerGetLastMonthPowerResponseDto toPowerGetLastMonthPowerResponseDto(int lastMonthCost, int monthBeforeLastCost){
+//        return PowerResponseDto.PowerGetLastMonthPowerResponseDto.builder()
+//                .lastMonthCost(lastMonthCost)
+//                .monthBeforeLastCost(monthBeforeLastCost)
+//                .build();
+//    }
 }
