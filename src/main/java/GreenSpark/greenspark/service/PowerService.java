@@ -132,32 +132,6 @@ public class PowerService {
         return powerRepository.save(power);
     }
 
-    public PowerResponseDto.PowerGetLastMonthPowerResponseDto getLastMonthPower(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
-
-        LocalDate now = LocalDate.now();
-        int currentYear = now.getYear();
-        int currentMonth = now.getMonthValue();
-
-        int lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear; // 1월이면 저번달의 년도를 올해 - 1 아니면 그대로
-        int lastMonth = currentMonth == 1 ? 12 : currentMonth - 1; // 1월이면 저번달은 12월 아니면 -1
-
-        int monthBeforeLastYear = lastMonth == 1 ? lastMonthYear - 1 : lastMonthYear; // 저번달이 1월이면 저저번달의 년도를 올해 -1 아니면 그대로
-        int monthBeforeLast = lastMonth == 1 ? 12 : lastMonth - 1; // 저번달이 1월이면 저저번달은 12월
-
-        Power lastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth)
-                .orElseThrow(() -> new EntityNotFoundException("저번 달 파워를 찾을 수 없습니다."));
-
-        Power monthBeforeLastPower = powerRepository.findByUserAndYearAndMonth(user, monthBeforeLastYear, monthBeforeLast)
-                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
-
-        int lastMonthCost = lastMonthPower.getCost();
-        int monthBeforeLastCost = monthBeforeLastPower.getCost();
-
-        return PowerConverter.toPowerGetLastMonthPowerResponseDto(lastMonthCost, monthBeforeLastCost);
-    }
-
     public PowerResponseDto.PowerGetExpectedCostResponseDto getExpectedCost(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
@@ -169,10 +143,24 @@ public class PowerService {
         int lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear; // 1월이면 저번달의 년도를 올해 - 1 아니면 그대로
         int lastMonth = currentMonth == 1 ? 12 : currentMonth - 1; // 1월이면 저번달은 12월 아니면 -1
 
+        int twoMonthAgoYear = lastMonth == 1 ? lastMonthYear - 1 : lastMonthYear; // 저번달이 1월이면 저저번달의 년도를 올해 -1 아니면 그대로
+        int twoMonthAgoMonth = lastMonth == 1 ? 12 : lastMonth - 1; // 저번달이 1월이면 저저번달은 12월
+
+        int threeMonthAgoYear = twoMonthAgoMonth == 1 ? twoMonthAgoYear - 1 : twoMonthAgoYear; // 저저번달이 1월이면 저저저번달의 년도를 올해 -1 아니면 그대로
+        int threeMonthAgoMonth = twoMonthAgoMonth == 1 ? 12 : twoMonthAgoMonth - 1; // 저저번달이 1월이면 저저저번달은 12월
+
         Power lastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth)
                 .orElseThrow(() -> new EntityNotFoundException("저번 달 파워를 찾을 수 없습니다."));
 
+        Power twoMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, twoMonthAgoYear, twoMonthAgoMonth)
+                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
+
+        Power threeMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, threeMonthAgoYear, threeMonthAgoMonth)
+                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
+
         int lastMonthCost = lastMonthPower.getCost();
+        int twoMonthAgoCost = twoMonthAgoPower.getCost();
+        int threeMonthAgoCost = threeMonthAgoPower.getCost();
 
         List<Power> userPowers = powerRepository.findAllByUser(user);
 
@@ -198,7 +186,7 @@ public class PowerService {
 
         int expectedCost = ((Number) response.getBody().get("predicted_cost")).intValue();
 
-        return PowerConverter.toGetExpectedCostResponseDto(expectedCost, lastMonthCost);
+        return PowerConverter.toGetExpectedCostResponseDto(expectedCost, lastMonthCost, twoMonthAgoCost, threeMonthAgoCost);
     }
 
     // 매년 1월 1일 00:00에 실행되도록 스케줄링 설정
@@ -208,4 +196,31 @@ public class PowerService {
         powerRepository.deleteByYearLessThanEqual(thresholdYear);
         System.out.println("3년 이상 지난 데이터가 삭제되었습니다.");
     }
+
+//    public PowerResponseDto.PowerGetLastMonthPowerResponseDto getLastMonthPower(Long userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+//
+//        LocalDate now = LocalDate.now();
+//        int currentYear = now.getYear();
+//        int currentMonth = now.getMonthValue();
+//
+//        int lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear; // 1월이면 저번달의 년도를 올해 - 1 아니면 그대로
+//        int lastMonth = currentMonth == 1 ? 12 : currentMonth - 1; // 1월이면 저번달은 12월 아니면 -1
+//
+//        int twoMonthAgoYear = lastMonth == 1 ? lastMonthYear - 1 : lastMonthYear; // 저번달이 1월이면 저저번달의 년도를 올해 -1 아니면 그대로
+//        int twoMonthAgoMonth = lastMonth == 1 ? 12 : lastMonth - 1; // 저번달이 1월이면 저저번달은 12월
+//
+//
+//        Power lastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth)
+//                .orElseThrow(() -> new EntityNotFoundException("저번 달 파워를 찾을 수 없습니다."));
+//
+//        Power twoMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, twoMonthAgoYear, twoMonthAgoMonth)
+//                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
+//
+//        int lastMonthCost = lastMonthPower.getCost();
+//        int twoMonthAgoCost = twoMonthAgoPower.getCost();
+//
+//        return PowerConverter.toPowerGetLastMonthPowerResponseDto(lastMonthCost, twoMonthAgoCost);
+//    }
 }
