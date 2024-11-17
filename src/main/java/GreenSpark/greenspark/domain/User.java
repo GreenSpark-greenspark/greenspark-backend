@@ -24,10 +24,12 @@ public class User extends BaseEntity {
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
-    private int household_members;
-    @Column(nullable = false)
-    private int electricity_due_date;
+    @Column(nullable = false, name = "household_members")
+    private int householdMembers;
+    @Column(nullable = false, name = "electricity_due_date")
+    private int electricityDueDate;
+    @Column(nullable = false, name = "total_point")
+    private int totalPoint;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Appliance> applianceList = new ArrayList<>();
