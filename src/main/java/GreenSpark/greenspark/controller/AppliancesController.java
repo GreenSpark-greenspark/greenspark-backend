@@ -4,7 +4,9 @@ package GreenSpark.greenspark.controller;
 import GreenSpark.greenspark.domain.Appliance;
 import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.dto.ApplianceDto;
+import GreenSpark.greenspark.jwt.JWTUtil;
 import GreenSpark.greenspark.repository.AppliancesRepository;
+import GreenSpark.greenspark.repository.UserRepository;
 import GreenSpark.greenspark.response.DataResponseDto;
 import GreenSpark.greenspark.service.AppliancesService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 public class AppliancesController {
     private final AppliancesService appliancesService;
     private final AppliancesRepository appliancesRepository;
+    private final JWTUtil jwtUtil;
+    private final UserRepository userRepository;
     //가전제품 검색 api
     @GetMapping("/appliances/search")
     public DataResponseDto<?> searchAppliances(@RequestParam(value = "modelName", required = false) String modelName,
@@ -46,10 +50,12 @@ public class AppliancesController {
         }
     }
 
+
     //내 가전제품 추가하기 api
-    @PostMapping("/appliances/{userId}")
-    public DataResponseDto<?> addAppliance(@PathVariable Long userId, @RequestBody ApplianceDto applianceDto) {
+    @PostMapping("/appliances/")
+    public DataResponseDto<?> addAppliance(@CookieValue("access") String authorization, @RequestBody ApplianceDto applianceDto) {
         try {
+            long userId = getUserId(authorization);
             appliancesService.Add_Appliances(userId, applianceDto);
             return DataResponseDto.of(null, "가전제품이 성공적으로 추가되었습니다.");
         } catch (IllegalArgumentException e) {
@@ -63,8 +69,9 @@ public class AppliancesController {
         }
     }
 
-    @PostMapping("/appliances/delete/{userId}/{applianceId}")
-    public DataResponseDto<?> deleteAppliance(@PathVariable Long userId, @PathVariable Long applianceId) {
+    @PostMapping("/appliances/delete/{applianceId}")
+    public DataResponseDto<?> deleteAppliance(@CookieValue("access") String authorization, @PathVariable Long applianceId) {
+        long userId = getUserId(authorization);
         appliancesService.deleteAppliance(userId, applianceId);
         return DataResponseDto.of(null,"해당 가전제품이 삭제되었습니다.");
     }
@@ -108,14 +115,16 @@ public class AppliancesController {
         }
     }
     //내 가전제품 목록보기 api
-    @GetMapping("/appliances/{userId}")
-    public DataResponseDto<?> getAllAppliances(@PathVariable Long userId) {
+    @GetMapping("/appliances/")
+    public DataResponseDto<?> getAllAppliances(@CookieValue("access") String authorization) {
+        long userId = getUserId(authorization);
         List<ApplianceDto.ApplianceDataResponseDto> userappliances=appliancesService.getUserAppliances(userId);
         return DataResponseDto.of(userappliances,"가전제품 목록을 조회했습니다.");
     }
 
-    @GetMapping("/appliances/history/{userId}")
-    public DataResponseDto<?> getApplianceHistory(@PathVariable Long userId) {
+    @GetMapping("/appliances/history/")
+    public DataResponseDto<?> getApplianceHistory(@CookieValue("access") String authorization) {
+        long userId = getUserId(authorization);
         LocalDate today=LocalDate.now();
         if(today.getDayOfMonth()==1){
             List<ApplianceDto.AppliancesHistoryResponseDto> history=appliancesService.get_Grade_Upgrade_Appliances(userId);
@@ -124,18 +133,19 @@ public class AppliancesController {
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }
 
-@GetMapping("/appliances/preview/{userId}")
-public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId) {
-    List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
-    List<Appliance> allAppliances = appliancesRepository.findByUser_UserId(userId);
-    List<Appliance> nonUpdatedAppliances = allAppliances.stream()
+    @GetMapping("/appliances/preview/")
+    public DataResponseDto<?> getRecentlyUpdatedAppliances(@CookieValue("access") String authorization) {
+        long userId = getUserId(authorization);
+        List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
+        List<Appliance> allAppliances = appliancesRepository.findByUser_UserId(userId);
+        List<Appliance> nonUpdatedAppliances = allAppliances.stream()
             .filter(appliance -> !updatedAppliances.contains(appliance))
             .collect(Collectors.toList());
 
-    List<ApplianceDto.ApplianceDataResponseDto> resultDtos = new ArrayList<>();
+        List<ApplianceDto.ApplianceDataResponseDto> resultDtos = new ArrayList<>();
 
-    if (!updatedAppliances.isEmpty()) {
-        resultDtos.addAll(updatedAppliances.stream()
+        if (!updatedAppliances.isEmpty()) {
+            resultDtos.addAll(updatedAppliances.stream()
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
                         .applianceId(appliance.getApplianceId())
                         .grade(appliance.getGrade())
@@ -143,7 +153,7 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .isUpdated(appliance.getIsUpdated())
                         .build())
                 .collect(Collectors.toList()));
-        resultDtos.addAll(nonUpdatedAppliances.stream()
+            resultDtos.addAll(nonUpdatedAppliances.stream()
                 .sorted(Comparator.comparing(Appliance::getApplianceId))
                 .limit(3 - updatedAppliances.size())
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
@@ -154,7 +164,7 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
                         .build())
                 .collect(Collectors.toList()));
     } else {
-        resultDtos.addAll(nonUpdatedAppliances.stream()
+            resultDtos.addAll(nonUpdatedAppliances.stream()
                 .sorted(Comparator.comparing(Appliance::getApplianceId))
                 .limit(3)
                 .map(appliance -> ApplianceDto.ApplianceDataResponseDto.builder()
@@ -167,4 +177,10 @@ public DataResponseDto<?> getRecentlyUpdatedAppliances(@PathVariable Long userId
     }
     return DataResponseDto.of(resultDtos, "가전제품 미리보기가 조회되었습니다.");
 }
+    private long getUserId(String authorizaiton){
+        String token=authorizaiton.replace("Bearer ","");
+        String username = jwtUtil.getUsername(token);
+        User user = userRepository.findByUsername(username);
+        return user.getUserId();
+    }
 }
