@@ -1,6 +1,7 @@
 package GreenSpark.greenspark.domain;
 
 import GreenSpark.greenspark.common.BaseEntity;
+import GreenSpark.greenspark.dto.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -21,14 +23,19 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String username;
     @Column(nullable = false)
-    private String email;
+    private String name;
     @Column(nullable = false)
+    private String email;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+    @Column(nullable = true)
     private String password;
-    @Column(nullable = false, name = "household_members")
+    @Column( name = "household_members")
     private int householdMembers;
-    @Column(nullable = false, name = "electricity_due_date")
+    @Column( name = "electricity_due_date")
     private int electricityDueDate;
-    @Column(nullable = false, name = "total_point")
+    @Column(name = "total_point")
     private int totalPoint;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -39,5 +46,6 @@ public class User extends BaseEntity {
     private List<Power> powerList = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Point> pointList = new ArrayList<>();
+
 }
 
