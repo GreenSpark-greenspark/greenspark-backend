@@ -5,6 +5,7 @@ import GreenSpark.greenspark.domain.Power;
 import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.dto.PowerRequestDto;
 import GreenSpark.greenspark.dto.PowerResponseDto;
+import GreenSpark.greenspark.jwt.JWTUtil;
 import GreenSpark.greenspark.repository.PowerRepository;
 import GreenSpark.greenspark.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,8 +29,10 @@ public class PowerService {
 
     private final PowerRepository powerRepository;
     private final UserRepository userRepository;
+    private final JWTUtil jwtUtil;
 
-    public Power createCostPower(Long userId, PowerRequestDto.PowerCreateCostRequestDto powerCreateCostRequestDto) {
+    public Power createCostPower(String authorization, PowerRequestDto.PowerCreateCostRequestDto powerCreateCostRequestDto) {
+        Long userId = getUserId(authorization);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -48,7 +51,8 @@ public class PowerService {
         return powerRepository.save(power);
     }
 
-    public Power createUsagePower(Long userId, PowerRequestDto.PowerCreateUsageRequestDto powerCreateUsageRequestDto) {
+    public Power createUsagePower(String authorization, PowerRequestDto.PowerCreateUsageRequestDto powerCreateUsageRequestDto) {
+        Long userId = getUserId(authorization);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -67,13 +71,12 @@ public class PowerService {
         return powerRepository.save(power);
     }
 
-    public List<PowerResponseDto.PowerGetDataResponseDto> getPowerData(Long userId, String display) {
+    public List<PowerResponseDto.PowerGetDataResponseDto> getPowerData(String authorization, String display) {
+        Long userId = getUserId(authorization);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
         LocalDate now = LocalDate.now();
-        int currentYear = now.getYear();
-        int currentMonth = now.getMonthValue();
 
         // 최근 24개월 전 날짜 계산
         LocalDate twoYearsAgo = now.minusMonths(24);
@@ -102,7 +105,8 @@ public class PowerService {
         }
     }
 
-    public List<PowerResponseDto.PowerGetAllResponseDto> getAllPowers(Long userId) {
+    public List<PowerResponseDto.PowerGetAllResponseDto> getAllPowers(String authorization) {
+        Long userId = getUserId(authorization);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -112,27 +116,8 @@ public class PowerService {
                 .collect(Collectors.toList());
     }
 
-    public Power createPower(Long userId, PowerRequestDto.PowerCreateRequestDto powerCreateRequestDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
-
-        int year = powerCreateRequestDto.getYear();
-        int month = powerCreateRequestDto.getMonth();
-        Optional<Power> existingPower = powerRepository.findByYearAndMonthAndUser(year, month, user);
-
-        Power power;
-        if (existingPower.isPresent()) { // 기존 데이터가 있을 경우 업데이트
-            power = existingPower.get();
-            power.setCost(powerCreateRequestDto.getCost());
-            power.setUsageAmount(powerCreateRequestDto.getUsageAmount());
-        } else { // 기존 데이터가 없을 경우 새로 생성
-            power = PowerConverter.toPower(user, powerCreateRequestDto);
-        }
-
-        return powerRepository.save(power);
-    }
-
-    public PowerResponseDto.PowerGetExpectedCostResponseDto getExpectedCost(Long userId) {
+    public PowerResponseDto.PowerGetExpectedCostResponseDto getExpectedCost(String authorization) {
+        Long userId = getUserId(authorization);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -195,6 +180,13 @@ public class PowerService {
         int thresholdYear = LocalDate.now().getYear() - 3;
         powerRepository.deleteByYearLessThanEqual(thresholdYear);
         System.out.println("3년 이상 지난 데이터가 삭제되었습니다.");
+    }
+
+    private long getUserId(String authorization){
+        String token=authorization.replace("Bearer ","");
+        String username = jwtUtil.getUsername(token);
+        User user = userRepository.findByUsername(username);
+        return user.getUserId();
     }
 
 //    public PowerResponseDto.PowerGetLastMonthPowerResponseDto getLastMonthPower(Long userId) {

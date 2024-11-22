@@ -52,7 +52,7 @@ public class AppliancesController {
 
 
     //내 가전제품 추가하기 api
-    @PostMapping("/appliances/")
+    @PostMapping("/appliances")
     public DataResponseDto<?> addAppliance(@CookieValue("access") String authorization, @RequestBody ApplianceDto applianceDto) {
         try {
             long userId = getUserId(authorization);
@@ -115,14 +115,14 @@ public class AppliancesController {
         }
     }
     //내 가전제품 목록보기 api
-    @GetMapping("/appliances/")
+    @GetMapping("/appliances")
     public DataResponseDto<?> getAllAppliances(@CookieValue("access") String authorization) {
         long userId = getUserId(authorization);
         List<ApplianceDto.ApplianceDataResponseDto> userappliances=appliancesService.getUserAppliances(userId);
         return DataResponseDto.of(userappliances,"가전제품 목록을 조회했습니다.");
     }
 
-    @GetMapping("/appliances/history/")
+    @GetMapping("/appliances/history")
     public DataResponseDto<?> getApplianceHistory(@CookieValue("access") String authorization) {
         long userId = getUserId(authorization);
         LocalDate today=LocalDate.now();
@@ -133,7 +133,7 @@ public class AppliancesController {
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }
 
-    @GetMapping("/appliances/preview/")
+    @GetMapping("/appliances/preview")
     public DataResponseDto<?> getRecentlyUpdatedAppliances(@CookieValue("access") String authorization) {
         long userId = getUserId(authorization);
         List<Appliance> updatedAppliances = appliancesRepository.findTop3ByUser_UserIdAndIsUpdatedOrderByUpdateDateDesc(userId, true);
@@ -177,8 +177,8 @@ public class AppliancesController {
     }
     return DataResponseDto.of(resultDtos, "가전제품 미리보기가 조회되었습니다.");
 }
-    private long getUserId(String authorizaiton){
-        String token=authorizaiton.replace("Bearer ","");
+    private long getUserId(String authorization){
+        String token=authorization.replace("Bearer ","");
         String username = jwtUtil.getUsername(token);
         User user = userRepository.findByUsername(username);
         return user.getUserId();

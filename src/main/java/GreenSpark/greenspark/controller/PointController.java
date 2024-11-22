@@ -1,6 +1,7 @@
 package GreenSpark.greenspark.controller;
 
 import GreenSpark.greenspark.converter.PointConverter;
+import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.dto.PointResponseDto;
 import GreenSpark.greenspark.response.DataResponseDto;
 import GreenSpark.greenspark.service.PointService;
@@ -14,12 +15,11 @@ public class PointController {
 
     private final PointService pointService;
 
-    @GetMapping(value = "/point/{userId}")
-    public DataResponseDto<PointResponseDto.PointGetResponseDto> getTotalPoint(
-            @PathVariable Long userId){
-        int totalPoint = pointService.getTotalPoint(userId);
-        PointResponseDto.PointGetResponseDto responseDto = PointConverter.toPointGetResponseDto(userId, totalPoint);
+    @GetMapping(value = "/point")
+    public DataResponseDto<Integer> getTotalPoint(
+            @CookieValue("access") String authorization){
+        int totalPoint = pointService.getTotalPoint(authorization);
 
-        return DataResponseDto.of(responseDto, "해당 유저의 사용 가능 포인트 조회를 완료했습니다.");
+        return DataResponseDto.of(totalPoint, "사용 가능 포인트 조회를 완료했습니다.");
     }
 }
