@@ -6,15 +6,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 public class PointResponseDto {
+
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PointGetResponseDto {
+    public static class PointUpdateResponseDto {
         @JsonProperty("user_id")
-        Long userId;
-        @JsonProperty("total_point")
-        int totalPoint;
+        private Long userId;
+        private LocalDate date;
+        @JsonProperty("after_point")
+        private int afterPoint;
+        @JsonProperty("point_amount")
+        private int pointAmount;
+        private String event;
     }
 }
