@@ -4,6 +4,8 @@ import GreenSpark.greenspark.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Builder
@@ -15,9 +17,11 @@ public class Point extends BaseEntity {
     @Column(name = "pointId")
     private Long pointId;
     @Column(nullable = false)
-    private int after_point;
-    @Column(nullable = false)
-    private int point_amount;
+    private LocalDate date;
+    @Column(nullable = false, name = "after_point")
+    private int afterPoint;
+    @Column(nullable = false, name = "point_amount")
+    private int pointAmount;
     @Column(nullable = false)
     private String event;
 
