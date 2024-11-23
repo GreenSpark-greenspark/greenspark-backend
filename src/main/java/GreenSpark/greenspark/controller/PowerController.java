@@ -20,47 +20,47 @@ public class PowerController {
 
     private final PowerService powerService;
 
-    @PostMapping(value = "/power/cost/{userId}")
+    @PostMapping(value = "/power/cost")
     public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createCostPower(
-            @PathVariable Long userId,
+            @CookieValue("access") String authorization,
             @RequestBody PowerRequestDto.PowerCreateCostRequestDto powerCreateCostRequestDto){
-        Power power = powerService.createCostPower(userId, powerCreateCostRequestDto);
+        Power power = powerService.createCostPower(authorization, powerCreateCostRequestDto);
         Long createdUserId = power.getUser().getUserId();
         PowerResponseDto.PowerCreateResponseDto responseDto = PowerConverter.toPowerCreateResponseDto(createdUserId);
 
         return DataResponseDto.of(responseDto, "전기요금 입력을 완료했습니다.");
     }
 
-    @PostMapping(value = "/power/usage/{userId}")
+    @PostMapping(value = "/power/usage")
     public DataResponseDto<PowerResponseDto.PowerCreateResponseDto> createUsagePower(
-            @PathVariable Long userId,
+            @CookieValue("access") String authorization,
             @RequestBody PowerRequestDto.PowerCreateUsageRequestDto powerCreateUsageRequestDto){
-        Power power = powerService.createUsagePower(userId, powerCreateUsageRequestDto);
+        Power power = powerService.createUsagePower(authorization, powerCreateUsageRequestDto);
         Long createdUserId = power.getUser().getUserId();
         PowerResponseDto.PowerCreateResponseDto responseDto = PowerConverter.toPowerCreateResponseDto(createdUserId);
 
         return DataResponseDto.of(responseDto, "전력사용량 입력을 완료했습니다.");
     }
 
-    @GetMapping(value = "/power/{userId}")
+    @GetMapping(value = "/power")
     public DataResponseDto<List<PowerResponseDto.PowerGetDataResponseDto>> getPowerData(
-            @PathVariable Long userId,
+            @CookieValue("access") String authorization,
             @RequestParam(name = "display") String display){
-        List<PowerResponseDto.PowerGetDataResponseDto> powerDataList = powerService.getPowerData(userId, display);
+        List<PowerResponseDto.PowerGetDataResponseDto> powerDataList = powerService.getPowerData(authorization, display);
         return DataResponseDto.of(powerDataList, "해당 유저의 전기요금 또는 전력사용량을 조회했습니다.");
     }
 
-    @GetMapping(value = "/power/history/{userId}")
+    @GetMapping(value = "/power/history")
     public DataResponseDto<List<PowerResponseDto.PowerGetAllResponseDto>> getAllPowers(
-            @PathVariable Long userId){
-        List<PowerResponseDto.PowerGetAllResponseDto> powerList = powerService.getAllPowers(userId);
+            @CookieValue("access") String authorization){
+        List<PowerResponseDto.PowerGetAllResponseDto> powerList = powerService.getAllPowers(authorization);
         return DataResponseDto.of(powerList, "해당 유저의 모든 파워 정보를 조회했습니다.");
     }
 
-    @GetMapping(value = "/power/expect/{userId}")
+    @GetMapping(value = "/power/expect")
     public DataResponseDto<PowerResponseDto.PowerGetExpectedCostResponseDto> getExpectedCost(
-            @PathVariable Long userId){
-        PowerResponseDto.PowerGetExpectedCostResponseDto expectedCostResponse = powerService.getExpectedCost(userId);
+            @CookieValue("access") String authorization){
+        PowerResponseDto.PowerGetExpectedCostResponseDto expectedCostResponse = powerService.getExpectedCost(authorization);
         return DataResponseDto.of(expectedCostResponse, "해당 유저의 예상 요금과 저번달 요금을 조회했습니다.");
     }
 
