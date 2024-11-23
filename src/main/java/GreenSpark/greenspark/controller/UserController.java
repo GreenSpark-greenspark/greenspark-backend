@@ -35,7 +35,7 @@ public class UserController {
         customLogoutHandler.logout(request, response);
     }
 
-    @PostMapping("/users/info/")
+    @PostMapping("/users/info")
     public DataResponseDto<?> CreateUserInfo(@CookieValue("access") String authorization, @RequestBody UserInfoDto userInfoDto){
         try{
             long userId=getUserId(authorization);
@@ -46,7 +46,7 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/users/mod-info/")
+    @PatchMapping("/users/mod-info")
     public DataResponseDto<?> UpdateUserInfo(@CookieValue("access") String authorization, @RequestBody UserInfoDto userInfoDto){
         try{
             long userId=getUserId(authorization);
