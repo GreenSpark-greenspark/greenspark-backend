@@ -24,4 +24,17 @@ public class PointResponseDto {
         private int pointAmount;
         private String event;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PointGetAllResponseDto {
+        private LocalDate date;
+        @JsonProperty("after_point")
+        private int afterPoint;
+        @JsonProperty("point_amount")
+        private int pointAmount;
+        private String event;
+    }
 }

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -37,7 +39,6 @@ public class PointService {
 
         int pointAmount = pointUpdateRequestDto.getPointAmount();
         int afterPoint = user.getTotalPoint() + pointAmount;
-        String event = pointUpdateRequestDto.getEvent();
         LocalDate now = LocalDate.now();
 
         // 현재 유저의 totalPoint에 업데이트된 포인트를 합한 후 저장
@@ -49,6 +50,18 @@ public class PointService {
         pointRepository.save(point);
 
         return PointConverter.pointtoPointUpdateResponseDto(user, point);
+    }
+
+    public List<PointResponseDto.PointGetAllResponseDto> getAllPoint(String authorization) {
+        Long userId = getUserId(authorization);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // createdAt이 가장 최근인 point 객체부터 내림차순 정렬
+        List<Point> points = pointRepository.findByUserOrderByCreatedAtDesc(user);
+        return points.stream()
+                .map(point -> new PointResponseDto.PointGetAllResponseDto(point.getDate(), point.getAfterPoint(), point.getPointAmount(), point.getEvent()))
+                .collect(Collectors.toList());
     }
 
     private long getUserId(String authorization){
