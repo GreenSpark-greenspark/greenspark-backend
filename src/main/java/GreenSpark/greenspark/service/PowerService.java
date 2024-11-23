@@ -173,6 +173,16 @@ public class PowerService {
         return PowerConverter.toGetExpectedCostResponseDto(expectedCost, lastMonthCost, twoMonthAgoCost, threeMonthAgoCost);
     }
 
+    public User resetPowers(String authorization) {
+        Long userId = getUserId(authorization);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        powerRepository.deleteByUser(user);
+
+        return user;
+    }
+
     // 매년 1월 1일 00:00에 실행되도록 스케줄링 설정
     @Scheduled(cron = "0 0 0 1 1 *")
     public void deleteOldRecordsOnNewYear() {
@@ -181,7 +191,7 @@ public class PowerService {
         System.out.println("3년 이상 지난 데이터가 삭제되었습니다.");
     }
 
-    private long getUserId(String authorization){
+    public Long getUserId(String authorization){
         String token=authorization.replace("Bearer ","");
         String username = jwtUtil.getUsername(token);
         User user = userRepository.findByUsername(username);

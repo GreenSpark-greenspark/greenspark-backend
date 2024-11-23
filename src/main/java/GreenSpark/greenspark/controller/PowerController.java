@@ -2,6 +2,7 @@ package GreenSpark.greenspark.controller;
 
 import GreenSpark.greenspark.converter.PowerConverter;
 import GreenSpark.greenspark.domain.Power;
+import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.dto.PowerRequestDto;
 import GreenSpark.greenspark.dto.PowerResponseDto;
 import GreenSpark.greenspark.response.DataResponseDto;
@@ -62,6 +63,16 @@ public class PowerController {
             @CookieValue("access") String authorization){
         PowerResponseDto.PowerGetExpectedCostResponseDto expectedCostResponse = powerService.getExpectedCost(authorization);
         return DataResponseDto.of(expectedCostResponse, "해당 유저의 예상 요금과 저번달 요금을 조회했습니다.");
+    }
+
+    @DeleteMapping(value = "/power/reset")
+    public DataResponseDto<PowerResponseDto.PowerResetResponseDto> resetPowers(
+            @CookieValue("access") String authorization){
+        User user = powerService.resetPowers(authorization);
+        Long userId = user.getUserId();
+        PowerResponseDto.PowerResetResponseDto responseDto = PowerConverter.toPowerResetResponseDto(userId);
+
+        return DataResponseDto.of(responseDto, "해당 유저의 파워 DB를 초기화했습니다.");
     }
 
     // 저번달 요금, 저저번달 요금 조회하는 API(사용하지 않음)
