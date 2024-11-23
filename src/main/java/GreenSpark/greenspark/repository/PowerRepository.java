@@ -20,4 +20,6 @@ public interface PowerRepository extends JpaRepository<Power, Long> {
     @Query("DELETE FROM Power p WHERE p.year <= :thresholdYear")
     void deleteByYearLessThanEqual(int thresholdYear);
     List<Power> findAllByUser(User user);
+    @Transactional
+    void deleteByUser(User user);
 }

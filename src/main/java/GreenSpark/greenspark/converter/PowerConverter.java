@@ -53,6 +53,11 @@ public class PowerConverter {
                 .threeMonthsAgoCost(threeMonthAgoCost)
                 .build();
     }
+    public static PowerResponseDto.PowerResetResponseDto toPowerResetResponseDto(Long userId){
+        return PowerResponseDto.PowerResetResponseDto.builder()
+                .userId(userId)
+                .build();
+    }
 
 //    public static PowerResponseDto.PowerGetLastMonthPowerResponseDto toPowerGetLastMonthPowerResponseDto(int lastMonthCost, int monthBeforeLastCost){
 //        return PowerResponseDto.PowerGetLastMonthPowerResponseDto.builder()

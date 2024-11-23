@@ -52,6 +52,15 @@ public class PowerResponseDto {
         private int threeMonthsAgoCost;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PowerResetResponseDto {
+        @JsonProperty("user_id")
+        Long userId;
+    }
+
 //    @Builder
 //    @Getter
 //    @Setter
