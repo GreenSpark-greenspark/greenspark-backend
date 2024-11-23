@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-@RestController("/api")
+@RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
