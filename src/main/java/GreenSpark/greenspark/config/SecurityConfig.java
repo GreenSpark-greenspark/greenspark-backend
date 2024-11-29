@@ -38,7 +38,7 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
-//    private final RefreshService refreshService;
+
 
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.authenticationConfiguration = authenticationConfiguration;
@@ -46,7 +46,6 @@ public class SecurityConfig {
         this.customSuccessHandler = customSuccessHandler;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
-//        this.refreshService = refreshService;
     }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -86,8 +85,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
 
-/*        http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, refreshService), UsernamePasswordAuthenticationFilter.class);*/
+
         //oauth2
         http
                 .oauth2Login(oauth2 -> oauth2
@@ -98,7 +96,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/api/reissue").permitAll()
+                        .requestMatchers("/oauth/**", "/","/api/reissue","/api/**").permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정 : STATELESS

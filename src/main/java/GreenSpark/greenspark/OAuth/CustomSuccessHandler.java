@@ -7,6 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -35,18 +37,31 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refreshToken = jwtUtil.createJwt("refresh",username, role, 1209600000L);
         addRefreshEntity(username,refreshToken,1209600000L);
 
-        response.addCookie(createCookie("access", accessToken));
-        response.addCookie(createCookie("refresh", refreshToken));
+//        createCookie("access",accessToken);
+//        createCookie("refresh",refreshToken);
 
-        response.sendRedirect("http://localhost:8080/swagger-ui/index.html#/");
+        addCookieWithSameSite(response, "access", accessToken, 600);
+        addCookieWithSameSite(response, "refresh", refreshToken, 1209600);
+
+        response.sendRedirect("https://green-spark.vercel.app/");
     }
 
-    private Cookie createCookie(String name, String value) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        return cookie;
-    }
+//    private Cookie createCookie(String name, String value) {
+//        Cookie cookie = new Cookie(name, value);
+//        cookie.setHttpOnly(true);
+//        cookie.setPath("/");
+//        return cookie;
+//    }
+private void addCookieWithSameSite(HttpServletResponse response, String name, String value, int maxAge) {
+    ResponseCookie cookie = ResponseCookie.from(name, value)
+            .maxAge(maxAge)
+            .httpOnly(true)
+            .secure(true) // HTTPS에서만 전송
+            .sameSite("None") // 크로스 사이트에서 작동 가능
+            .path("/")
+            .build();
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+}
 
 
     private void addRefreshEntity(String username, String refresh, Long expiredMs) {

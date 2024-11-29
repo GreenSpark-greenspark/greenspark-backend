@@ -184,3 +184,4 @@ public class AppliancesController {
         return user.getUserId();
     }
 }
+
