@@ -77,21 +77,32 @@ public class AppliancesController {
     }
     //내 가전제품 상세보기 api
     @GetMapping("/appliances/detail/{applianceId}")
-    public DataResponseDto<?> getApplianceDetail(@PathVariable Long applianceId) {
-        Appliance appliance = appliancesRepository.findById(applianceId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid applianceId"));
-        String modelName = appliance.getModelTerm();
-        String equipmentName = appliance.getMatchTerm();
-        String jsonResponse = appliancesService.Search_appliances_OpenAPI(modelName, equipmentName);
-        ObjectMapper objectMapper = new ObjectMapper();
-
+    public DataResponseDto<?> getApplianceDetail(@CookieValue("access") String authorization,
+                                                 @PathVariable Long applianceId) {
         try {
+            long userId = getUserId(authorization);
+
+            // 가전제품 조회 및 소유자 확인
+            Appliance appliance = appliancesRepository.findById(applianceId)
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 가전제품 ID입니다."));
+
+            if (!appliance.getUser().getUserId().equals(userId)) {
+                return DataResponseDto.of(null, "해당 가전제품에 접근 권한이 없습니다.");
+            }
+
+            // OpenAPI 요청 처리
+            String modelName = appliance.getModelTerm();
+            String equipmentName = appliance.getMatchTerm();
+            String jsonResponse = appliancesService.Search_appliances_OpenAPI(modelName, equipmentName);
+            ObjectMapper objectMapper = new ObjectMapper();
+
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             int totalCount = rootNode.path("response").path("body").path("totalCount").asInt();
 
             if (totalCount == 0) {
                 return DataResponseDto.of(null, "검색 결과가 없습니다.");
             }
+
             JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
             ArrayNode filteredItems = objectMapper.createArrayNode();
 
@@ -101,14 +112,17 @@ public class AppliancesController {
                     filteredItems.add(itemNode);
                 }
             }
-            ObjectNode responseNode = objectMapper.createObjectNode();
-            responseNode.set("items", filteredItems);
 
             if (filteredItems.isEmpty()) {
                 return DataResponseDto.of(null, "검색 결과가 없습니다.");
             }
 
+            ObjectNode responseNode = objectMapper.createObjectNode();
+            responseNode.set("items", filteredItems);
+
             return DataResponseDto.of(responseNode.toString(), "가전제품 상세보기를 조회했습니다.");
+        } catch (IllegalArgumentException e) {
+            return DataResponseDto.of(null, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return DataResponseDto.of(null, "데이터 처리 중 오류가 발생했습니다.");
