@@ -6,6 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -26,5 +27,8 @@ public class Quiz extends BaseEntity {
     private String choice4;
     @Column(nullable = false)
     private String answer;
+    @Column(nullable = false)
+    private String explanation;
+
 
 }

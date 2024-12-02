@@ -31,9 +31,15 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        customLogoutHandler.logout(request, response);
+    public DataResponseDto<?> logout(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
+            customLogoutHandler.logout(request, response);
+            return DataResponseDto.of(null, "로그아웃이 성공적으로 완료되었습니다.");
+        } catch (Exception e) {
+            return DataResponseDto.of("로그아웃 중 오류가 발생했습니다.");
+        }
     }
+
 
     @PostMapping("/users/info")
     public DataResponseDto<?> CreateUserInfo(@CookieValue("access") String authorization, @RequestBody UserInfoDto userInfoDto){
