@@ -1,7 +1,6 @@
 package GreenSpark.greenspark.jwt;
 
 import GreenSpark.greenspark.OAuth.CustomOAuth2User;
-//import GreenSpark.greenspark.dto.CustomUserDetails;
 import GreenSpark.greenspark.dto.UserDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -54,12 +53,27 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+//        if (access == null) {
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("{\"error\": \"Access token is missing\"}");
+//            return;
+//        }
 
+//        if (jwtUtil.isExpired(access)) {
+//            System.out.println("Token expired for URI: " + requestUri);
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 반환
+//            response.getWriter().write("Access token expired");
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
         if (jwtUtil.isExpired(access)) {
-            System.out.println("Token expired for URI: " + requestUri);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 반환
-            response.getWriter().write("Access token expired");
-            filterChain.doFilter(request, response);
+            System.out.println("Access token expired for URI: " + requestUri);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Access token expired\"}");
             return;
         }
 
