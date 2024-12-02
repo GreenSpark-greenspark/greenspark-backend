@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -66,8 +67,8 @@ public class PointService {
 
     private long getUserId(String authorization){
         String token=authorization.replace("Bearer ","");
-        String username = jwtUtil.getUsername(token);
-        User user = userRepository.findByUsername(username);
-        return user.getUserId();
+        String email = jwtUtil.getemail(token);
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get().getUserId();
     }
 }

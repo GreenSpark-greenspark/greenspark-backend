@@ -191,11 +191,11 @@ public class PowerService {
         System.out.println("3년 이상 지난 데이터가 삭제되었습니다.");
     }
 
-    public Long getUserId(String authorization){
+    private long getUserId(String authorization){
         String token=authorization.replace("Bearer ","");
-        String username = jwtUtil.getUsername(token);
-        User user = userRepository.findByUsername(username);
-        return user.getUserId();
+        String email = jwtUtil.getemail(token);
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get().getUserId();
     }
 
 //    public PowerResponseDto.PowerGetLastMonthPowerResponseDto getLastMonthPower(Long userId) {

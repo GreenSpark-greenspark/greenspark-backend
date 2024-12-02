@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -30,10 +32,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2Response oAuth2Response = null;
         oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
 
-        String username = oAuth2Response.getProvider()+ " "+ oAuth2Response.getProviderId();
-        User existData = userRepository.findByUsername(username);
+        String email = oAuth2Response.getEmail();
+        Optional<User> existData = userRepository.findByEmail(email);
 
-        if(existData == null) {
+        String username = oAuth2Response.getProvider()+ " "+ oAuth2Response.getProviderId();
+//        User existData = userRepository.findByUsername(username);
+
+        if(existData.isEmpty()) {
             User userEntity = User.builder()
                     .username(username)
                     .role(Role.ROLE_USER)
@@ -52,15 +57,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         }
         else {
-            existData.setEmail(oAuth2Response.getEmail());
-            existData.setName(oAuth2Response.getName());
+            User userEntity = existData.get();
+            userEntity.setEmail(oAuth2Response.getEmail());
+            userEntity.setName(oAuth2Response.getName());
 
-            userRepository.save(existData);
+            userRepository.save(userEntity);
 
             UserDTO userDTO = new UserDTO();
-            userDTO.setUsername(existData.getUsername());
+            userDTO.setUsername(existData.get().getUsername());
             userDTO.setName(oAuth2Response.getName());
-            userDTO.setRole(existData.getRole().toString());
+            userDTO.setRole(existData.get().getRole().toString());
 
             return new CustomOAuth2User(userDTO);
         }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -63,10 +64,10 @@ public class QuizController {
         }
     }
 
-    private long getUserId(String authorization) {
-        String token = authorization.replace("Bearer ", "");
-        String username = jwtUtil.getUsername(token);
-        User user = userRepository.findByUsername(username);
-        return user.getUserId();
+    private long getUserId(String authorization){
+        String token=authorization.replace("Bearer ","");
+        String email = jwtUtil.getemail(token);
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get().getUserId();
     }
 }

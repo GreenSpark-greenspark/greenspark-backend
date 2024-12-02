@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -56,10 +58,10 @@ public class MemoController {
         }
     }
 
-    private long getUserId(String authorization) {
-        String token = authorization.replace("Bearer ", "");
-        String username = jwtUtil.getUsername(token);
-        User user = userRepository.findByUsername(username);
-        return user.getUserId();
+    private long getUserId(String authorization){
+        String token=authorization.replace("Bearer ","");
+        String email = jwtUtil.getemail(token);
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get().getUserId();
     }
 }

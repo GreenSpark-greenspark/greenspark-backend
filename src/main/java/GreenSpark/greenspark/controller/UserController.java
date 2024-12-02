@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -79,11 +80,11 @@ public class UserController {
         }
     }
 
-    private long getUserId(String authorizaiton){
-        String token=authorizaiton.replace("Bearer ","");
-        String username = jwtUtil.getUsername(token);
-        User user = userRepository.findByUsername(username);
-        return user.getUserId();
+    private long getUserId(String authorization){
+        String token=authorization.replace("Bearer ","");
+        String email = jwtUtil.getemail(token);
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get().getUserId();
     }
 
 }

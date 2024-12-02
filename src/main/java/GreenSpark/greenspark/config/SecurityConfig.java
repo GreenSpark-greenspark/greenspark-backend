@@ -120,3 +120,8 @@ public class SecurityConfig {
         return new SecurityRequirement().addList("bearerAuth");
     }
 }
+
+//        http
+//                .authorizeRequests(auth -> auth
+//        .requestMatchers("api/login","/api/**","/oauth/**", "/","/api/reissue").permitAll()
+//                        .anyRequest().authenticated());
