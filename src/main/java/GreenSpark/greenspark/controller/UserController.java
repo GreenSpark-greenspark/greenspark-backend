@@ -62,6 +62,22 @@ public class UserController {
             return DataResponseDto.of(e.getMessage());
         }
     }
+    @GetMapping("/users/verify")
+    public DataResponseDto<?> verifyUser(@CookieValue("access") String authorization) {
+        try {
+            // 토큰에서 유저 정보를 추출
+            long userId = getUserId(authorization);
+
+            // 유저가 DB에 존재하는지 확인
+            if (userRepository.existsById(userId)) {
+                return DataResponseDto.of(null, "유저가 확인되었습니다.");
+            } else {
+                return DataResponseDto.of("유저를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return DataResponseDto.of("토큰 검증에 실패했습니다.");
+        }
+    }
 
     private long getUserId(String authorizaiton){
         String token=authorizaiton.replace("Bearer ","");
