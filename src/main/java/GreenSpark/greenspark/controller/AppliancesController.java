@@ -2,10 +2,13 @@ package GreenSpark.greenspark.controller;
 
 
 import GreenSpark.greenspark.domain.Appliance;
+import GreenSpark.greenspark.domain.Memo;
 import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.dto.ApplianceDto;
+import GreenSpark.greenspark.dto.MemoDto;
 import GreenSpark.greenspark.jwt.JWTUtil;
 import GreenSpark.greenspark.repository.AppliancesRepository;
+import GreenSpark.greenspark.repository.MemoRepository;
 import GreenSpark.greenspark.repository.UserRepository;
 import GreenSpark.greenspark.response.DataResponseDto;
 import GreenSpark.greenspark.service.AppliancesService;
@@ -31,6 +34,7 @@ public class AppliancesController {
     private final AppliancesRepository appliancesRepository;
     private final JWTUtil jwtUtil;
     private final UserRepository userRepository;
+    private final MemoRepository memoRepository;
     //가전제품 검색 api
     @GetMapping("/appliances/search")
     public DataResponseDto<?> searchAppliances(@RequestParam(value = "modelName", required = false) String modelName,
@@ -75,7 +79,7 @@ public class AppliancesController {
         appliancesService.deleteAppliance(userId, applianceId);
         return DataResponseDto.of(null,"해당 가전제품이 삭제되었습니다.");
     }
-    //내 가전제품 상세보기 api
+    // 가전제품 상세보기 API 수정
     @GetMapping("/appliances/detail/{applianceId}")
     public DataResponseDto<?> getApplianceDetail(@CookieValue("access") String authorization,
                                                  @PathVariable Long applianceId) {
@@ -117,8 +121,16 @@ public class AppliancesController {
                 return DataResponseDto.of(null, "검색 결과가 없습니다.");
             }
 
+            // 가전제품에 대한 메모 조회
+            List<Memo> memos = memoRepository.findByAppliance(appliance);  // 가전제품에 해당하는 모든 메모 조회
+            List<MemoDto> memoDtos = memos.stream()
+                    .map(memo -> new MemoDto(memo.getContent())) // Memo 객체를 MemoDto로 변환
+                    .collect(Collectors.toList());
+
+            // 응답에 메모 내용 추가
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.set("items", filteredItems);
+            responseNode.set("memos", objectMapper.valueToTree(memoDtos)); // 메모를 응답에 포함
 
             return DataResponseDto.of(responseNode.toString(), "가전제품 상세보기를 조회했습니다.");
         } catch (IllegalArgumentException e) {
@@ -146,6 +158,7 @@ public class AppliancesController {
         }
         return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
     }
+
 
     @GetMapping("/appliances/preview")
     public DataResponseDto<?> getRecentlyUpdatedAppliances(@CookieValue("access") String authorization) {
@@ -191,6 +204,7 @@ public class AppliancesController {
     }
     return DataResponseDto.of(resultDtos, "가전제품 미리보기가 조회되었습니다.");
 }
+
     private long getUserId(String authorization){
         String token=authorization.replace("Bearer ","");
         String username = jwtUtil.getUsername(token);
