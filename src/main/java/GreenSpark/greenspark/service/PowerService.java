@@ -133,18 +133,25 @@ public class PowerService {
         int threeMonthAgoYear = twoMonthAgoMonth == 1 ? twoMonthAgoYear - 1 : twoMonthAgoYear; // 저저번달이 1월이면 저저저번달의 년도를 올해 -1 아니면 그대로
         int threeMonthAgoMonth = twoMonthAgoMonth == 1 ? 12 : twoMonthAgoMonth - 1; // 저저번달이 1월이면 저저저번달은 12월
 
-        Power lastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth)
-                .orElseThrow(() -> new EntityNotFoundException("저번 달 파워를 찾을 수 없습니다."));
+        Optional<Power> existingLastMonthPower = powerRepository.findByUserAndYearAndMonth(user, lastMonthYear, lastMonth);
+        Optional<Power> existingTwoMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, twoMonthAgoYear, twoMonthAgoMonth);
+        Optional<Power> existingThreeMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, threeMonthAgoYear, threeMonthAgoMonth);
 
-        Power twoMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, twoMonthAgoYear, twoMonthAgoMonth)
-                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
+        int lastMonthCost = 0;
+        int twoMonthAgoCost = 0;
+        int threeMonthAgoCost = 0;
 
-        Power threeMonthAgoPower = powerRepository.findByUserAndYearAndMonth(user, threeMonthAgoYear, threeMonthAgoMonth)
-                .orElseThrow(() -> new EntityNotFoundException("저저번 달 파워를 찾을 수 없습니다."));
+        if (existingLastMonthPower.isPresent()) {
+            lastMonthCost = existingLastMonthPower.get().getCost();
+        }
 
-        int lastMonthCost = lastMonthPower.getCost();
-        int twoMonthAgoCost = twoMonthAgoPower.getCost();
-        int threeMonthAgoCost = threeMonthAgoPower.getCost();
+        if (existingTwoMonthAgoPower.isPresent()) {
+            twoMonthAgoCost = existingTwoMonthAgoPower.get().getCost();
+        }
+
+        if (existingThreeMonthAgoPower.isPresent()) {
+            threeMonthAgoCost = existingThreeMonthAgoPower.get().getCost();
+        }
 
         List<Power> userPowers = powerRepository.findAllByUser(user);
 
