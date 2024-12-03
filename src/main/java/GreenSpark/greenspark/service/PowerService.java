@@ -155,6 +155,11 @@ public class PowerService {
 
         List<Power> userPowers = powerRepository.findAllByUser(user);
 
+        // Power 객체가 비어있는 경우 기본값 반환
+        if (userPowers.isEmpty()) {
+            return PowerConverter.toGetExpectedCostResponseDto(0, lastMonthCost, twoMonthAgoCost, threeMonthAgoCost);
+        }
+
         // FastAPI에 보낼 JSON request 생성
         List<PowerRequestDto.PowerGetExpectedCostRequestToFastAPIDto> expectedCostRequest = userPowers.stream()
                 // cost가 0이 아닌 경우만 필터링 (cost가 0인 경우는 전력사용량만 입력한 경우이므로)
