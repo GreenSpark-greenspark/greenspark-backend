@@ -3,6 +3,7 @@ package GreenSpark.greenspark.controller;
 import GreenSpark.greenspark.OAuth.CustomLogoutHandler;
 import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.dto.UserInfoDto;
+import GreenSpark.greenspark.dto.UserPageDto;
 import GreenSpark.greenspark.jwt.JWTUtil;
 import GreenSpark.greenspark.repository.UserRepository;
 import GreenSpark.greenspark.response.DataResponseDto;
@@ -87,8 +88,8 @@ public class UserController {
         String name=user.getName();
         int householdMembers=user.getHouseholdMembers();
         int electricityDueDate=user.getElectricityDueDate();
-        UserInfoDto userInfoDto=new UserInfoDto(name,householdMembers,electricityDueDate);
-        return DataResponseDto.of(userInfoDto);
+        UserPageDto userPageDto=new UserPageDto(name,householdMembers,electricityDueDate);
+        return DataResponseDto.of(userPageDto);
 
     }
 
