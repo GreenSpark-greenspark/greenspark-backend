@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class UserInfoDto {
+    private String username;
     private int householdMembers;
     private int electricityDueDate;
 }
