@@ -7,7 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserInfoDto {
+public class UserPageDto {
+    private String name;
     private int householdMembers;
     private int electricityDueDate;
 }
