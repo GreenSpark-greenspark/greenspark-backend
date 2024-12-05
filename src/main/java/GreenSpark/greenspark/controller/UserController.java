@@ -7,6 +7,7 @@ import GreenSpark.greenspark.jwt.JWTUtil;
 import GreenSpark.greenspark.repository.UserRepository;
 import GreenSpark.greenspark.response.DataResponseDto;
 import GreenSpark.greenspark.service.UserService;
+import jakarta.persistence.Column;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -77,6 +78,18 @@ public class UserController {
         } catch (Exception e) {
             return DataResponseDto.of("토큰 검증에 실패했습니다.");
         }
+    }
+    @GetMapping("/users/my")
+    public DataResponseDto<?> getMyUsers(@CookieValue("access") String authorization) {
+        String token=authorization.replace("Bearer ","");
+        String username = jwtUtil.getUsername(token);
+        User user=userRepository.findByUsername(username);
+        String name=user.getName();
+        int householdMembers=user.getHouseholdMembers();
+        int electricityDueDate=user.getElectricityDueDate();
+        UserInfoDto userInfoDto=new UserInfoDto(name,householdMembers,electricityDueDate);
+        return DataResponseDto.of(userInfoDto);
+
     }
 
     private long getUserId(String authorizaiton){
