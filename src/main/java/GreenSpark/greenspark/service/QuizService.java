@@ -10,7 +10,9 @@ import GreenSpark.greenspark.repository.UserDailyQuizRepository;
 import GreenSpark.greenspark.repository.UserQuizRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +26,27 @@ public class QuizService {
     private final UserQuizRecordRepository userQuizRecordRepository;
     private final UserDailyQuizRepository userDailyQuizRepository;
 
+    @Scheduled(cron = "0 0 0 * * *") // 매일 정각 실행
+    @Transactional
+    public void refreshDailyQuizzes() {
+        List<Long> allUserIds = userDailyQuizRepository.findAllUserIds(); // 모든 사용자 ID 조회
+        allUserIds.forEach(userId -> refreshQuizzesForUser(userId));
+}
+    @Transactional
+    public void refreshQuizzesForUser(Long userId) {
+        // 사용자별로 퀴즈 초기화
+        userDailyQuizRepository.deleteByUserId(userId);
+
+        // 새로운 퀴즈 선택
+        List<Quiz> newQuizzes = quizRepository.findQuizzesExcludingSolvedByUser(userId, Pageable.ofSize(2)).getContent();
+        newQuizzes.forEach(quiz -> userDailyQuizRepository.save(
+                UserDailyQuiz.builder()
+                        .userId(userId)
+                        .quiz(quiz)
+                        .providedDate(LocalDate.now())
+                        .build()
+        ));
+    }
 
     public List<QuizWithSolvedDto> getDailyQuizzes(Long userId) {
         // 오늘 제공된 퀴즈 가져오기
@@ -92,5 +115,8 @@ public class QuizService {
                         .solved(true)
                         .build()
         );
+    }
+    public boolean hasUserAlreadySubmitted(Long userId, Long quizId) {
+        return userQuizRecordRepository.existsByUserIdAndQuiz_QuizId(userId, quizId);
     }
 }

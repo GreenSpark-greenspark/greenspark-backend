@@ -32,5 +32,8 @@ spring:
                 - profile
   jwt:
     secret: ${JWT_SECRET}
+  task:
+    scheduling:
+      time-zone: Asia/Seoul
 server:
   forward-headers-strategy: FRAMEWORK
