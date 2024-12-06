@@ -5,12 +5,14 @@ import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.domain.enums.ApplianceCategory;
 import GreenSpark.greenspark.dto.ApplianceDto;
 import GreenSpark.greenspark.repository.AppliancesRepository;
+import GreenSpark.greenspark.repository.MemoRepository;
 import GreenSpark.greenspark.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 public class AppliancesService {
     private final UserRepository userRepository;
     private final AppliancesRepository applianceRepository;
+    private final MemoRepository memoRepository;
 
 
     @Value("${api.service-key}") String serviceKey;
@@ -96,6 +99,7 @@ public class AppliancesService {
 
     }
 
+    @Transactional
     public void deleteAppliance(Long userId, Long applianceId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID입니다."));
@@ -106,6 +110,7 @@ public class AppliancesService {
         if (!appliance.getUser().getUserId().equals(userId)) {
             throw new IllegalStateException("해당 가전제품은 사용자의 소유가 아닙니다.");
         }
+        memoRepository.deleteByAppliance_ApplianceId(applianceId);
         applianceRepository.delete(appliance);
     }
     public List<ApplianceDto.ApplianceDataResponseDto> getUserAppliances(Long userId) {

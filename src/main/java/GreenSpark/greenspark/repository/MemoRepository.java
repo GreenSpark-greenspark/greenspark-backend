@@ -13,4 +13,7 @@ public interface MemoRepository extends JpaRepository<Memo, Long> {
     List<Memo> findByAppliance(Appliance appliance);
 
     Memo findByApplianceAndUser(Appliance appliance, User user);
+
+    void deleteByAppliance_ApplianceId(Long applianceId);
 }
+
