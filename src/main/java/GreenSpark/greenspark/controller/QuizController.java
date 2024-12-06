@@ -55,6 +55,9 @@ public class QuizController {
             @RequestParam String userAnswer) {
         try {
             long userId = getUserId(authorization);
+            if (quizService.hasUserAlreadySubmitted(userId, quizId)) {
+                return DataResponseDto.of(null, "이미 제출한 퀴즈입니다.");
+            }
             QuizResultDto result = quizService.submitQuiz(userId, quizId, userAnswer);
             return DataResponseDto.of(result, "퀴즈가 성공적으로 제출되었습니다.");
         } catch (Exception e) {
