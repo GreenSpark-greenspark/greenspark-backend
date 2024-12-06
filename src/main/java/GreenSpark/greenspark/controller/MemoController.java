@@ -26,9 +26,9 @@ public class MemoController {
 
     // 메모 작성 API
     @PostMapping("/appliances/{applianceId}/memo")
-    public DataResponseDto<?> createMemo(@CookieValue("access") String authorization,
-                                         @PathVariable Long applianceId,
-                                         @RequestBody MemoDto memoDto) {
+    public DataResponseDto<?> createOrUpdateMemo(@CookieValue("access") String authorization,
+                                                 @PathVariable Long applianceId,
+                                                 @RequestBody MemoDto memoDto) {
         try {
             long userId = getUserId(authorization);
 
@@ -39,20 +39,29 @@ public class MemoController {
                 return DataResponseDto.of(null, "해당 가전제품에 접근 권한이 없습니다.");
             }
 
-            Memo memo = Memo.builder()
-                    .content(memoDto.getContent())
-                    .user(appliance.getUser())
-                    .appliance(appliance)
-                    .build();
+            // 동일 사용자와 가전제품에 대한 기존 메모 확인
+            Memo existingMemo = memoRepository.findByApplianceAndUser(appliance, appliance.getUser());
 
-            memoRepository.save(memo);
-
-            return DataResponseDto.of(null, "메모가 성공적으로 추가되었습니다.");
+            if (existingMemo != null) {
+                // 기존 메모 업데이트
+                existingMemo.setContent(memoDto.getContent());
+                memoRepository.save(existingMemo);
+                return DataResponseDto.of(null, "메모가 성공적으로 업데이트되었습니다.");
+            } else {
+                // 새로운 메모 생성
+                Memo newMemo = Memo.builder()
+                        .content(memoDto.getContent())
+                        .user(appliance.getUser())
+                        .appliance(appliance)
+                        .build();
+                memoRepository.save(newMemo);
+                return DataResponseDto.of(null, "메모가 성공적으로 추가되었습니다.");
+            }
         } catch (IllegalArgumentException e) {
             return DataResponseDto.of(null, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return DataResponseDto.of(null, "메모 추가 중 오류가 발생했습니다.");
+            return DataResponseDto.of(null, "메모 처리 중 오류가 발생했습니다.");
         }
     }
 
