@@ -4,6 +4,8 @@ import GreenSpark.greenspark.common.BaseEntity;
 import GreenSpark.greenspark.dto.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +39,9 @@ public class User extends BaseEntity {
     private int electricityDueDate;
     @Column(name = "total_point")
     private int totalPoint;
+    @Column(nullable = false)
+//    @ColumnDefault("false")
+    private Boolean attendance;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Appliance> applianceList = new ArrayList<>();
