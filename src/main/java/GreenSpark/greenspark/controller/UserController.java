@@ -93,8 +93,21 @@ public class UserController {
 
     }
 
-    private long getUserId(String authorizaiton){
-        String token=authorizaiton.replace("Bearer ","");
+    @PostMapping("/users/attendance")
+    public DataResponseDto<Boolean> checkAttendance(
+            @CookieValue("access") String authorization){
+        long userId = getUserId(authorization);
+
+        if (userService.checkAttendance(userId) == Boolean.FALSE){
+            return DataResponseDto.of(true, "출석 체크를 완료했습니다.");
+        }
+        else {
+            return DataResponseDto.of(false, "이미 출석 체크를 완료한 유저입니다.");
+        }
+    }
+
+    private long getUserId(String authorization){
+        String token=authorization.replace("Bearer ","");
         String username = jwtUtil.getUsername(token);
         User user = userRepository.findByUsername(username);
         return user.getUserId();
