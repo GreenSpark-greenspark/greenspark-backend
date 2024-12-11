@@ -1,9 +1,11 @@
 package GreenSpark.greenspark.service;
 import GreenSpark.greenspark.converter.ApplicationConverter;
 import GreenSpark.greenspark.domain.Appliance;
+import GreenSpark.greenspark.domain.ApplianceHistory;
 import GreenSpark.greenspark.domain.User;
 import GreenSpark.greenspark.domain.enums.ApplianceCategory;
 import GreenSpark.greenspark.dto.ApplianceDto;
+import GreenSpark.greenspark.repository.ApplianceHistoryRepository;
 import GreenSpark.greenspark.repository.AppliancesRepository;
 import GreenSpark.greenspark.repository.MemoRepository;
 import GreenSpark.greenspark.repository.UserRepository;
@@ -20,6 +22,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -32,7 +37,7 @@ public class AppliancesService {
     private final UserRepository userRepository;
     private final AppliancesRepository applianceRepository;
     private final MemoRepository memoRepository;
-
+    private final ApplianceHistoryRepository applianceHistoryRepository;
 
     @Value("${api.service-key}") String serviceKey;
 
@@ -124,24 +129,43 @@ public class AppliancesService {
                 .collect(Collectors.toList());
     }
 
-    public List<ApplianceDto.AppliancesHistoryResponseDto> get_Grade_Upgrade_Appliances(Long userId) {
+    public void updateGradeAndSaveHistory(Long userId,LocalDate today) {
         List<Appliance> appliances = applianceRepository.findByUser_UserId(userId);
-        List<ApplianceDto.AppliancesHistoryResponseDto> updatedAppliances = appliances.stream()
-                .map(appliance -> {
-                    String apiResponse = Search_appliances_OpenAPI(appliance.getModelTerm(), appliance.getMatchTerm());
-                    String updatedGrade = parseGradeFromApiResponse(apiResponse);
-                    if (updatedGrade != null && !appliance.getGrade().equals(updatedGrade)) {
-                        String previousGrade=appliance.getGrade();
-                        appliance.updateGrade(updatedGrade);
-                        applianceRepository.save(appliance);
-                        return new ApplianceDto.AppliancesHistoryResponseDto(appliance.getApplianceId(), previousGrade, updatedGrade, appliance.getMatchTerm());
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
 
-        return updatedAppliances;
+        appliances.forEach(appliance -> {
+            String apiResponse = Search_appliances_OpenAPI(appliance.getModelTerm(), appliance.getMatchTerm());
+            String updatedGrade = parseGradeFromApiResponse(apiResponse);
+
+            if (updatedGrade != null && !appliance.getGrade().equals(updatedGrade)) {
+                String previousGrade = appliance.getGrade();
+                appliance.updateGrade(updatedGrade);
+                applianceRepository.save(appliance);
+
+                ApplianceHistory history = ApplianceHistory.builder()
+                        .user(appliance.getUser())
+                        .appliance(appliance)
+                        .previousGrade(previousGrade)
+                        .nextGrade(updatedGrade)
+                        .matchTerm(appliance.getMatchTerm())
+                        .changeDate(today)
+                        .build();
+                applianceHistoryRepository.save(history);
+            }
+        });
+    }
+
+    public List<ApplianceDto.AppliancesHistoryResponseDto> getAllApplianceHistories(Long userId) {
+        List<ApplianceHistory> histories = applianceHistoryRepository.findByUser_UserId(userId);
+
+        return histories.stream()
+                .map(history -> ApplianceDto.AppliancesHistoryResponseDto.builder()
+                        .applianceId(history.getAppliance().getApplianceId())
+                        .previousGrade(history.getPreviousGrade())
+                        .nextGrade(history.getNextGrade())
+                        .matchTerm(history.getMatchTerm())
+                        .callDate(history.getChangeDate())
+                        .build())
+                .collect(Collectors.toList());
     }
     private String parseGradeFromApiResponse(String apiResponse) {
         try {

@@ -151,12 +151,16 @@ public class AppliancesController {
     @GetMapping("/appliances/history")
     public DataResponseDto<?> getApplianceHistory(@CookieValue("access") String authorization) {
         long userId = getUserId(authorization);
-        LocalDate today=LocalDate.now();
-        if(today.getDayOfMonth()==1){
-            List<ApplianceDto.AppliancesHistoryResponseDto> history=appliancesService.get_Grade_Upgrade_Appliances(userId);
-            return DataResponseDto.of(new ApplianceDto.AppliancesHistoryResponse(history, today),"가전제품 히스토리 목록을 조회했습니다.");
+        LocalDate today = LocalDate.now();
+        if (today.getDayOfMonth() == 1) {
+            appliancesService.updateGradeAndSaveHistory(userId,today);
         }
-        return DataResponseDto.of(null,"효율등급이 변경된 히스토리 목록이 없습니다.");
+
+        List<ApplianceDto.AppliancesHistoryResponseDto> histories = appliancesService.getAllApplianceHistories(userId);
+        return DataResponseDto.of(
+                histories,
+                "가전제품 변경 이력을 조회했습니다."
+        );
     }
 
 

@@ -38,6 +38,7 @@ public class ApplianceDto {
         private String previousGrade;
         private String nextGrade;
         private String matchTerm;
+        private LocalDate callDate;
     }
 
     @Getter
@@ -47,7 +48,6 @@ public class ApplianceDto {
     @Builder
     public static class AppliancesHistoryResponse{
         private List<AppliancesHistoryResponseDto> history;
-        private LocalDate callDate;
     }
 
     @Getter
@@ -61,3 +61,4 @@ public class ApplianceDto {
 
     }
 }
+
