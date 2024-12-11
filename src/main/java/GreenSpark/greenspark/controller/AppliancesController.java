@@ -158,7 +158,7 @@ public class AppliancesController {
 
         List<ApplianceDto.AppliancesHistoryResponseDto> histories = appliancesService.getAllApplianceHistories(userId);
         return DataResponseDto.of(
-                new ApplianceDto.AppliancesHistoryResponse(histories),
+                histories,
                 "가전제품 변경 이력을 조회했습니다."
         );
     }
