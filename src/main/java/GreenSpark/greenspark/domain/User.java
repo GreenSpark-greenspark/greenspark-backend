@@ -39,8 +39,8 @@ public class User extends BaseEntity {
     private int electricityDueDate;
     @Column(name = "total_point")
     private int totalPoint;
-    @Column(nullable = false)
-//    @ColumnDefault("false")
+    //@ColumnDefault("false")
+    @Column
     private Boolean attendance;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
