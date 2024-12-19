@@ -84,28 +84,33 @@ public class ReissueController {
         return DataResponseDto.of("토큰 재발급 성공");
     }
 
-//    private Cookie createCookie(String name, String value) {
-//        Cookie cookie = new Cookie(name, value);
-//        cookie.setHttpOnly(true);
-//        cookie.setPath("/");
-//        return cookie;
-//    }
     private void addCookieWithSameSite(HttpServletResponse response, String name, String value, int maxAge) {
-    // Host 헤더에서 localhost 여부 판단
-        boolean isLocalhost = "localhost".equals(response.getHeader("Host"));
-
         ResponseCookie cookie = ResponseCookie.from(name, value)
-            .maxAge(maxAge) // 쿠키의 유효기간 설정 (초 단위)
-            .httpOnly(true) // 클라이언트 스크립트에서 접근 불가
-            .secure(!isLocalhost) // localhost에서는 secure=false, 배포 환경에서는 true
-            .sameSite(isLocalhost ? "Lax" : "None") // 개발 환경에서는 Lax, 배포 환경에서는 None
-            .domain(isLocalhost ? null : "api.greenspark.shop") // localhost에서는 도메인 제거, 배포 환경에서는 도메인 지정
-            .path("/") // 모든 경로에서 접근 가능
-            .build();
+                .maxAge(maxAge)
+                .httpOnly(true)
+                .secure(true) // HTTPS에서만 전송
+                .sameSite("None") // 크로스 사이트에서 작동 가능
+                .path("/")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 
-    // Set-Cookie 헤더에 추가
-    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-}
+//    private void addCookieWithSameSite(HttpServletResponse response, String name, String value, int maxAge) {
+//    // Host 헤더에서 localhost 여부 판단
+//        boolean isLocalhost = "localhost".equals(response.getHeader("Host"));
+//
+//        ResponseCookie cookie = ResponseCookie.from(name, value)
+//            .maxAge(maxAge) // 쿠키의 유효기간 설정 (초 단위)
+//            .httpOnly(true) // 클라이언트 스크립트에서 접근 불가
+//            .secure(!isLocalhost) // localhost에서는 secure=false, 배포 환경에서는 true
+//            .sameSite(isLocalhost ? "Lax" : "None") // 개발 환경에서는 Lax, 배포 환경에서는 None
+//            .domain(isLocalhost ? null : "api.greenspark.shop") // localhost에서는 도메인 제거, 배포 환경에서는 도메인 지정
+//            .path("/") // 모든 경로에서 접근 가능
+//            .build();
+//
+//    // Set-Cookie 헤더에 추가
+//    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+//}
 
     private void addRefreshEntity(String username, String refresh, Long expiredMs) {
         Optional<Refresh> existingRefreshToken = refreshRepository.findByUsername(username);

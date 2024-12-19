@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
                 .exposedHeaders("Authorization", "Set-Cookie")
-                .allowedOriginPatterns("https://green-spark.vercel.app", "http://localhost:3000","http://localhost:8080")
+                .allowedOriginPatterns("https://www.greenspark.shop", "http://localhost:3000","http://localhost:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
